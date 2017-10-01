@@ -9,6 +9,7 @@ from docopt import docopt
 from random import sample
 from random import randrange
 
+
 usage = """pml.py
 
 Usage:
@@ -21,6 +22,7 @@ Options:
   -i, --info             Print graph traversal information.
 
 """
+
 
 def load_graphml(file):
 	# load file
@@ -45,6 +47,7 @@ def load_graphml(file):
 		"edges": edges
 	}
 	return graph
+
 
 def get_apl(graph, verbose=False):
 	"""Calculate average path length"""
@@ -72,6 +75,7 @@ def get_apl(graph, verbose=False):
 		total_pl_sum += node_plsum
 	return total_pl_sum
 
+
 def disable_nodes(graph0, disabled):
 	graph = deepcopy(graph0)
 	# filter out disabled nodes from node list
@@ -84,9 +88,11 @@ def disable_nodes(graph0, disabled):
 	graph["edges"] = new_edges
 	return graph
 
+
 def enable_nodes(graph, enabled):
 	disabled = [n for n in graph["nodes"] if n not in enabled]
 	return disable_nodes(graph, " ".join(disabled))
+
 
 def main():
 
