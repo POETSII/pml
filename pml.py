@@ -8,6 +8,7 @@ from copy import deepcopy
 from docopt import docopt
 from random import sample
 from random import randrange
+from multiprocessing import Pool
 
 
 usage = """pml.py
@@ -19,7 +20,8 @@ Usage:
   pml.py impact <node_count> <trials> [options] <file.graphml>
 
 Options:
-  -i, --info             Print graph traversal information.
+  -i, --info         Print graph traversal information.
+  -w, --workers <n>  Use n parallel workers [default: 1].
 
 """
 
@@ -116,12 +118,29 @@ def main():
 
 		# random enable/disable
 
+		file = args["<file.graphml>"]
 		trials = int(args["<trials>"])
+		nworkers = int(args["--workers"])
 		node_count = int(args["<node_count>"])
 
-		file = args["<file.graphml>"]
+		# calculate how many trials to run in each of (nworkers) tasks
 
-		impact_list = get_impact_list(file, trials, m=node_count)
+		trials_batch1 = trials / nworkers
+		trials_batch2 = trials - trials_batch1 * (nworkers-1)
+
+		trials_per_task = [trials_batch1] * (nworkers-1) + [trials_batch2]
+
+		# construct task call arguments
+
+		task_args = [{
+			"file": file,
+			"trials": trials,
+			"m": node_count
+		} for trials in trials_per_task]
+
+		pool = Pool(nworkers)
+		task_results = pool.map(get_impact_list_kwargs, task_args)
+		impact_list = sum(task_results, [])  # flatten list of lists
 
 		print json.dumps(impact_list, indent=4)
 
@@ -136,6 +155,10 @@ def get_impact(graph, disabled):
 	m = len(disabled)
 	graph_mod = disable_nodes(graph, disabled)
 	return get_apl(graph_mod) / float((n-m)*(n-m-1))
+
+
+def get_impact_list_kwargs(kwargs):
+	return get_impact_list(**kwargs)
 
 
 def get_impact_list(file, trials=10, m=1, method="random"):
