@@ -22,6 +22,7 @@ Usage:
 Options:
   -i, --info         Print graph traversal information.
   -w, --workers <n>  Use n parallel workers [default: 1].
+  -p, --psuedo       Use psuedo-randomization.
 
 """
 
@@ -122,6 +123,7 @@ def main():
 		trials = int(args["<trials>"])
 		nworkers = int(args["--workers"])
 		node_count = int(args["<node_count>"])
+		method = "psuedo" if args["--psuedo"] else "random"
 
 		# calculate how many trials to run in each of (nworkers) tasks
 
@@ -135,7 +137,8 @@ def main():
 		task_args = [{
 			"file": file,
 			"trials": trials,
-			"m": node_count
+			"m": node_count,
+			"method": method
 		} for trials in trials_per_task]
 
 		pool = Pool(nworkers)
