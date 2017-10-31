@@ -1,11 +1,10 @@
-## POETS Application-level Drug Discovery Tool (PML)
+## POETS Network Analysis Tool (PML)
 
-This is a software tool that generates POETS markup (POETS XML) from drug
-discovery graph instances (GraphML), and can perform average shortest path
-analysis on input problems, serving as a reference implementation for POETS
-and other software tools.
+This is a tool for generating network-analysis POETS applications (POETS XML)
+from input networks in GraphML. It also includes reference implementations for
+the generated POETS code for comparison against POETS hardware.
 
-The general usage pattern for the tool is `pml.py [options] <sucbommand> <files..>`.
+The general usage pattern is `pml.py [options] <sucbommand> <files..>`.
 
 ### Usage
 
@@ -42,8 +41,8 @@ pip install -r requirements.txt
 
 To generate a POETS XML file, you'll need
 
-1. a `jinja2` template xml file (the tool ships with ready-made drug discovery
-template `templates/fantasi.xml`)
+1. a `jinja2` template xml file (the tool ships with a ready-made drug
+discovery template `templates/fantasi.xml`)
 
 2. an input problem graph
 
