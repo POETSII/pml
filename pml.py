@@ -136,8 +136,19 @@ def main():
 
 		# list enable/disable
 
+		if args["<node_list>"]:
+			nodes = args["<node_list>"].split()
+			non_existent = set(nodes) - set(graph["nodes"])
+			if non_existent:
+				print "Error, the following nodes are not defined in %s:" % (
+					args["<file.graphml>"])
+				for node in non_existent:
+					print " - %s" % node
+				sys.exit(1)
+
 		if args["disable"]:
 			disabled = args["<node_list>"].split()
+			enabled = set(graph["nodes"]) - set(disabled)
 			graph = enable_nodes(graph, enabled)
 		if args["enable"]:
 			enabled = args["<node_list>"].split()
