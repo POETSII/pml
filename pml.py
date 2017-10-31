@@ -8,16 +8,18 @@ from copy import deepcopy
 from docopt import docopt
 from random import sample
 from random import randrange
+from jinja2 import Template
 from multiprocessing import Pool
 
 
 usage = """pml.py
 
 Usage:
-  pml.py apl [options] <file.graphml>
-  pml.py apl enable <node_list> [options] <file.graphml>
-  pml.py apl disable <node_list> [options] <file.graphml>
-  pml.py impact <node_count> <trials> [options] <file.graphml>
+  pml.py [options] apl <file.graphml>
+  pml.py [options] apl enable <node_list> <file.graphml>
+  pml.py [options] apl disable <node_list> <file.graphml>
+  pml.py [options] impact <node_count> <trials> <file.graphml>
+  pml.py [options] genxml <template.xml> <file.graphml>
 
 Options:
   -i, --info         Print graph traversal information.
@@ -97,6 +99,34 @@ def enable_nodes(graph, enabled):
 	return disable_nodes(graph, " ".join(disabled))
 
 
+def load_text(file):
+	with open(file, "r") as fid:
+		return fid.read()
+
+
+def get_edge_list(graph):
+	"""Return a list of graph edges"""
+
+	def get_sublist(source, destinations):
+		return [(source, dest) for dest in destinations]
+
+	sublists = [get_sublist(source, destinations)
+		for source, destinations in graph["edges"].iteritems()]
+
+	return sum(sublists, [])  # return flattened list
+
+
+def generate_xml(template_file, graphml_file):
+	graph = load_graphml(graphml_file)
+	template_str= load_text(template_file)
+	template = Template(template_str)
+	content = {
+		"nodes": graph["nodes"],
+		"edges": get_edge_list(graph)
+	}
+	print template.render(**content)
+
+
 def main():
 
 	args = docopt(usage, version="pml.py ver 1.0")
@@ -146,6 +176,12 @@ def main():
 		impact_list = sum(task_results, [])  # flatten list of lists
 
 		print json.dumps(impact_list, indent=4)
+
+	elif args["genxml"]:
+
+		# generate xml
+
+		generate_xml(args["<template.xml>"], args["<file.graphml>"])
 
 	else:
 
