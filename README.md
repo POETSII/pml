@@ -119,3 +119,19 @@ Here running 10 trials in which 20 random nodes where removed from the graph,
 and calculating impact in each case. The output produced by the tool is a JSON list.
 
 Impact analysis can be parallelized using the `--workers` switch.
+
+### Benchmark problems
+
+These are sample graphs of increasing complexity (n5 is the largest, with 3487
+nodes) that PML can convert into POETS XML:
+
+* https://poets-project.org/download/n1.graphml
+* https://poets-project.org/download/n2.graphml
+* https://poets-project.org/download/n3.graphml
+* https://poets-project.org/download/n4.graphml
+* https://poets-project.org/download/n5.graphml
+
+The following archive contains 10 more graphs ranging from 1k to 10k nodes
+which can be used for stress testing:
+
+* https://poets-project.org/download/big_network_problems.tar.gz
