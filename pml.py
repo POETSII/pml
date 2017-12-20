@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-import sys
 import json
-import xml.etree.ElementTree as ET
 
-from copy import deepcopy
+from graphs import reduce_graph
+from graphs import get_edge_list
 from docopt import docopt
 from random import sample
 from random import randrange
 from jinja2 import Template
+from graphml import load_graphml
 from multiprocessing import Pool
-
 
 usage = """pml.py
 
@@ -27,31 +26,6 @@ Options:
   -p, --psuedo       Use psuedo-randomization.
 
 """
-
-
-def load_graphml(file):
-	# load file
-	try:
-		root = ET.parse(file).getroot()[0]
-	except IOError:
-		print "File not found: %s" % file
-		sys.exit(1)
-	# parse nodes
-	namespaces = {"graphml": "http://graphml.graphdrawing.org/xmlns"}
-	get_node_name = lambda e_node : e_node.attrib["id"]
-	nodes = map(get_node_name, root.findall("graphml:node", namespaces))
-	# create, populate and return graph
-	edges = {n:set() for n in nodes}
-	for e in root.findall("graphml:edge", namespaces):
-		n1 = e.attrib["source"]
-		n2 = e.attrib["target"]
-		edges[n1].add(n2)
-		edges[n2].add(n1)
-	graph = {
-		"nodes": nodes,
-		"edges": edges
-	}
-	return graph
 
 
 def get_apl(graph, verbose=False):
@@ -81,39 +55,9 @@ def get_apl(graph, verbose=False):
 	return total_pl_sum
 
 
-def disable_nodes(graph0, disabled):
-	graph = deepcopy(graph0)
-	# filter out disabled nodes from node list
-	graph["nodes"] = [n for n in graph["nodes"] if n not in disabled]
-	# filter out disabled nodes from node edges
-	is_enabled = lambda n : n not in disabled
-	new_edges = {}
-	for n in graph["nodes"]:
-		new_edges[n] = set(filter(is_enabled, graph["edges"][n]))
-	graph["edges"] = new_edges
-	return graph
-
-
-def enable_nodes(graph, enabled):
-	disabled = [n for n in graph["nodes"] if n not in enabled]
-	return disable_nodes(graph, " ".join(disabled))
-
-
 def load_text(file):
 	with open(file, "r") as fid:
 		return fid.read()
-
-
-def get_edge_list(graph):
-	"""Return a list of graph edges"""
-
-	def get_sublist(source, destinations):
-		return [(source, dest) for dest in destinations]
-
-	sublists = [get_sublist(source, destinations)
-		for source, destinations in graph["edges"].iteritems()]
-
-	return sum(sublists, [])  # return flattened list
 
 
 def generate_xml(template_file, graphml_file):
@@ -144,15 +88,15 @@ def main():
 					args["<file.graphml>"])
 				for node in non_existent:
 					print " - %s" % node
-				sys.exit(1)
+				raise Exception("Non-existent node(s)")
 
 		if args["disable"]:
 			disabled = args["<node_list>"].split()
 			enabled = set(graph["nodes"]) - set(disabled)
-			graph = enable_nodes(graph, enabled)
+			graph = reduce_graph(graph, lambda node: node in enabled)
 		if args["enable"]:
 			enabled = args["<node_list>"].split()
-			graph = enable_nodes(graph, enabled)
+			graph = reduce_graph(graph, lambda node: node in enabled)
 
 		print get_apl(graph, verbose=args["--info"])
 
@@ -203,7 +147,7 @@ def get_impact(graph, disabled):
 	"""Calculate impact of disabling a subset of graph nodes"""
 	n = len(graph["nodes"])
 	m = len(disabled)
-	graph_mod = disable_nodes(graph, disabled)
+	graph_mod = reduce_graph(graph, lambda node: node not in disabled)
 	return get_apl(graph_mod) / float((n-m)*(n-m-1))
 
 
