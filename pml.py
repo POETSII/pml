@@ -2,14 +2,16 @@
 
 import json
 
+from apl import get_apl
 from graphs import reduce_graph
 from graphs import get_edge_list
 from docopt import docopt
 from random import sample
 from random import randrange
-from jinja2 import Template
 from graphml import load_graphml
+from exporter import generate_xml
 from multiprocessing import Pool
+
 
 usage = """pml.py
 
@@ -28,49 +30,6 @@ Options:
 """
 
 
-def get_apl(graph, verbose=False):
-	"""Calculate average path length"""
-
-	total_pl_sum = 0
-	def log(msg):
-		if verbose:
-			print msg
-	for n in graph["nodes"]:
-		log("Searching from node: %s" % n)
-		visited = set([n])
-		to_visit = graph["edges"][n]
-		depth = 1
-		node_plsum = 0
-		while to_visit:
-			node_plsum += depth * len(to_visit)
-			visited |= to_visit
-			new_to_visit = set()
-			for m in to_visit:
-				new_to_visit |= graph["edges"][m]
-			to_visit = new_to_visit - visited
-			log("  at depth = %d, discovered: %s" % (depth, list(to_visit)))
-			depth += 1
-		log("  sum of node path distances = %d" % node_plsum)
-		total_pl_sum += node_plsum
-	return total_pl_sum
-
-
-def load_text(file):
-	with open(file, "r") as fid:
-		return fid.read()
-
-
-def generate_xml(template_file, graphml_file):
-	graph = load_graphml(graphml_file)
-	template_str= load_text(template_file)
-	template = Template(template_str)
-	content = {
-		"nodes": graph["nodes"],
-		"edges": get_edge_list(graph)
-	}
-	print template.render(**content)
-
-
 def main():
 
 	args = docopt(usage, version="pml.py ver 1.0")
@@ -84,16 +43,12 @@ def main():
 			nodes = args["<node_list>"].split()
 			non_existent = set(nodes) - set(graph["nodes"])
 			if non_existent:
-				print "Error, the following nodes are not defined in %s:" % (
-					args["<file.graphml>"])
-				for node in non_existent:
-					print " - %s" % node
-				raise Exception("Non-existent node(s)")
+				raise Exception("Non-existent node(s): %s" ", ".join(non_existent))
 
 		if args["disable"]:
 			disabled = args["<node_list>"].split()
-			enabled = set(graph["nodes"]) - set(disabled)
-			graph = reduce_graph(graph, lambda node: node in enabled)
+			graph = reduce_graph(graph, lambda node: node not in disabled)
+
 		if args["enable"]:
 			enabled = args["<node_list>"].split()
 			graph = reduce_graph(graph, lambda node: node in enabled)
@@ -135,8 +90,8 @@ def main():
 	elif args["genxml"]:
 
 		# generate xml
-
-		generate_xml(args["<template.xml>"], args["<file.graphml>"])
+		graph = load_graphml(args["<file.graphml>"])
+		generate_xml(args["<template.xml>"], graph)
 
 	else:
 
