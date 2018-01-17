@@ -1,4 +1,5 @@
 from jinja2 import Template
+from graphs import get_edge_list
 
 
 def load_text(file):
