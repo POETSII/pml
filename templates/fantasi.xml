@@ -2,7 +2,7 @@
 <Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
     <GraphType id="fantasi">
         <MessageTypes>
-            <MessageType id="init"/>
+            <MessageType id="__init__"/>
             <MessageType id="update">
                 <Message>
                     <Scalar name="distance" type="uint32_t"/>
@@ -14,7 +14,7 @@
                 <State>
                     <Scalar type="uint32_t" name="distance"/>
                 </State>
-                <InputPin name="init" messageTypeId="init">
+                <InputPin name="__init__" messageTypeId="__init__">
                     <OnReceive>
                         <![CDATA[
 
