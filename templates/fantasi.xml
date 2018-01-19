@@ -13,6 +13,7 @@
             <DeviceType id="flipflop">
                 <State>
                     <Scalar type="uint32_t" name="distance"/>
+                    <Scalar type="uint32_t" name="rts"/>
                 </State>
                 <InputPin name="__init__" messageTypeId="__init__">
                     <OnReceive>
