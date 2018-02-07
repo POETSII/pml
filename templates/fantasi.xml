@@ -56,11 +56,15 @@
         </DeviceTypes>
     </GraphType>
     <GraphInstance graphTypeId="fantasi" id="graph0">
-    <DeviceInstances>{% for node in nodes %}
-        <DevI type="flipflop" id="{{ node }}"/>{% endfor %}
+    <DeviceInstances>
+        {%- for node in nodes %}
+        <DevI type="flipflop" id="{{ node }}"/>
+        {%- endfor %}
     </DeviceInstances>
-    <EdgeInstances>{% for src, dst in edges %}
-        <EdgeI path="{{ src }}:in-n2:{{ dst }}"/>{% endfor %}
+    <EdgeInstances>
+        {%- for src, dst in edges %}
+        <EdgeI path="{{ src }}:in-{{ dst }}:out"/>
+        {%- endfor %}
     </EdgeInstances>
 </GraphInstance>
 </Graphs>
