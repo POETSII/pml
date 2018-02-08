@@ -146,3 +146,8 @@ through n5 above:
 * https://poets-project.org/download/fantasi-n3.xml
 * https://poets-project.org/download/fantasi-n4.xml
 * https://poets-project.org/download/fantasi-n5.xml
+
+### Other Tools
+
+The repo contains a simple support tool `gml.py` that can be used to generate
+random graphs in GraphML format (usage is `gml.py <nodes> <edges>`).
