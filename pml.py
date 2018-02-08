@@ -19,8 +19,8 @@ Usage:
   pml.py [options] apl <file.graphml>
   pml.py [options] apl enable <node_list> <file.graphml>
   pml.py [options] apl disable <node_list> <file.graphml>
+  pml.py [options] gen <template.xml> <file.graphml>
   pml.py [options] impact <node_count> <trials> <file.graphml>
-  pml.py [options] genxml <template.xml> <file.graphml>
 
 Options:
   -i, --info         Print graph traversal information.
@@ -87,7 +87,7 @@ def main():
 
 		print json.dumps(impact_list, indent=4)
 
-	elif args["genxml"]:
+	elif args["gen"]:
 
 		# generate xml
 		graph = load_graphml(args["<file.graphml>"])

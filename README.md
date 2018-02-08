@@ -13,8 +13,8 @@ Usage:
   pml.py [options] apl <file.graphml>
   pml.py [options] apl enable <node_list> <file.graphml>
   pml.py [options] apl disable <node_list> <file.graphml>
+  pml.py [options] gen <template.xml> <file.graphml>
   pml.py [options] impact <node_count> <trials> <file.graphml>
-  pml.py [options] genxml <template.xml> <file.graphml>
 
 Options:
   -i, --info         Print graph traversal information.
@@ -55,7 +55,7 @@ wget -q https://poets-project.org/download/n3.graphml
 
 # Run the tool
 
-./pml.py genxml templates/fantasi.xml n3.graphml > poets.xml
+./pml.py gen templates/fantasi.xml n3.graphml > poets.xml
 ```
 
 This will generate a POETS application for calculating average shortest path
