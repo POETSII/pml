@@ -120,7 +120,7 @@ and calculating impact in each case. The output produced by the tool is a JSON l
 
 Impact analysis can be parallelized using the `--workers` switch.
 
-### Benchmark problems
+### Benchmark Problems
 
 These are sample graphs of increasing complexity (n5 is the largest, with 3487
 nodes) that PML can convert into POETS XML:
@@ -135,3 +135,14 @@ The following archive contains 10 more graphs ranging from 1k to 10k nodes
 which can be used for stress testing:
 
 * https://poets-project.org/download/big_network_problems.tar.gz
+
+### Sample Generated POETS Markup
+
+These files are generated using the `fantasi.xml` template and the graphs n1
+through n5 above:
+
+* https://poets-project.org/download/fantasi-n1.xml
+* https://poets-project.org/download/fantasi-n2.xml
+* https://poets-project.org/download/fantasi-n3.xml
+* https://poets-project.org/download/fantasi-n4.xml
+* https://poets-project.org/download/fantasi-n5.xml
