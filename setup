@@ -1,3 +1,4 @@
 alias pml="python pml.py"
+alias gml="python gml.py"
 
 source env/bin/activate
