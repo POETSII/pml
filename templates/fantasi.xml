@@ -58,8 +58,8 @@
     </GraphType>
     <GraphInstance graphTypeId="fantasi" id="graph0">
     <DeviceInstances>
-        {%- for node in nodes %}
-        <DevI type="flipflop" id="{{ node }}"/>
+        {%- for node in node_info %}
+        <DevI type="flipflop" id="{{ node.name }}"/>
         {%- endfor %}
     </DeviceInstances>
     <EdgeInstances>

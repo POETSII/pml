@@ -8,10 +8,21 @@ def load_text(file):
 
 
 def generate_xml(template_file, graph):
+
     template_str = load_text(template_file)
     template = Template(template_str)
+
+    # Create and pass a node_info dict instead of graph['node'] (this contains
+    # node indices as well as node names). Pass graph['edges'] as is.
+
+    node_info = [
+        {"name": name, "index": ind}
+        for ind, name in enumerate(graph["nodes"])
+    ]
+
     content = {
-        "nodes": graph["nodes"],
+        "node_info": node_info,
         "edges": get_edge_list(graph)
     }
+
     print template.render(**content)
