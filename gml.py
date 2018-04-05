@@ -9,12 +9,12 @@ from itertools import product
 usage = """gml.py
 
 Usage:
-  gml.py <nodes> <edges>
+  gml.py random <nodes> <edges>
+  gml.py ring <length>
 
 """
 
-template = r"""
-<?xml version="1.0" encoding="UTF-8"?>
+template = r"""<?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
@@ -26,7 +26,7 @@ template = r"""
     {%- for src, dst in edges %}
     <edge source="{{ src }}" target="{{ dst }}"/>
     {%- endfor %}
-    </graph>
+  </graph>
 </graphml>
 """
 
@@ -40,6 +40,15 @@ def generate(nodes, edges):
     return graph
 
 
+def generate_ring(length):
+    """Create a graph consisting of a chain of length 'length'."""
+
+    nodes = ["n%d" % i for i in range(length)]
+    edges = zip(nodes[:-1], nodes[1:]) + [(nodes[-1], nodes[0])]
+    graph = {"nodes": nodes, "edges": edges}
+    return graph
+
+
 def render_graphml(graph):
     """Return GraphML string representation of a graph."""
 
@@ -48,11 +57,17 @@ def render_graphml(graph):
 
 def main():
     args = docopt(usage, version="gml.py v0.1")
-    nodes = int(args["<nodes>"])
-    edges = int(args["<edges>"])
-    graph = generate(nodes, edges)
-    graphml = render_graphml(graph)
-    print graphml
+
+    if args["random"]:
+        nodes = int(args["<nodes>"])
+        edges = int(args["<edges>"])
+        graph = generate(nodes, edges)
+
+    elif args["ring"]:
+        length = int(args["<length>"])
+        graph = generate_ring(length)
+
+    print render_graphml(graph)
 
 
 if __name__ == "__main__":
