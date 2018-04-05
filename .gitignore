@@ -145,3 +145,5 @@ $RECYCLE.BIN/
 *.graphml
 
 networks/*
+
+*.sublime-workspace
