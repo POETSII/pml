@@ -1,7 +1,7 @@
 #!/bin/env python
 
 from gml import generate_ring
-from exporer import generate_xml
+from exporter import generate_xml
 from itertools import product
 
 

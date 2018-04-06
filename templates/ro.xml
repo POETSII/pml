@@ -69,7 +69,7 @@
 
                         if (deviceProperties->id == 0) {
 
-                            // starting node propagate a fixed number of messages
+                            // starting node propagates a fixed number of messages
 
                             handler_log(2, "Cycle %d", deviceState->counter);
 

@@ -12,13 +12,13 @@ def reduce_graph(graph, predicate):
 def get_edge_list(graph):
     """Return a list of graph edges"""
 
-    def get_sublist(source, destinations):
-        return [(source, dest) for dest in destinations]
+    result = list()
 
-    sublists = [get_sublist(source, destinations)
-        for source, destinations in graph["edges"].iteritems()]
+    for src, destinations in graph["edges"].iteritems():
+        for dst in destinations:
+            result.append((src, dst))
 
-    return sum(sublists, [])  # return flattened list
+    return result
 
 
 def get_edge_dict(edge_list):
