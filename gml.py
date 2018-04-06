@@ -2,7 +2,8 @@
 
 from random import sample
 from docopt import docopt
-from jinja2 import Template
+from graphs import get_edge_dict
+from exporter import generate_xml
 from itertools import product
 
 
@@ -35,7 +36,8 @@ def generate(nodes, edges):
     """Create a graph with specified numbers of nodes and edges."""
 
     nodes = ["n%d" % i for i in range(nodes)]
-    edges = sample(list(product(nodes, nodes)), edges)
+    edge_list = sample(list(product(nodes, nodes)), edges)
+    edges = get_edge_dict(edge_list)
     graph = {"nodes": nodes, "edges": edges}
     return graph
 
@@ -44,15 +46,10 @@ def generate_ring(length):
     """Create a graph consisting of a chain of length 'length'."""
 
     nodes = ["n%d" % i for i in range(length)]
-    edges = zip(nodes[:-1], nodes[1:]) + [(nodes[-1], nodes[0])]
+    edge_list = zip(nodes[:-1], nodes[1:]) + [(nodes[-1], nodes[0])]
+    edges = get_edge_dict(edge_list)
     graph = {"nodes": nodes, "edges": edges}
     return graph
-
-
-def render_graphml(graph):
-    """Return GraphML string representation of a graph."""
-
-    return Template(template).render(**graph)
 
 
 def main():
@@ -67,7 +64,7 @@ def main():
         length = int(args["<length>"])
         graph = generate_ring(length)
 
-    print render_graphml(graph)
+    print generate_xml(template, graph)
 
 
 if __name__ == "__main__":
