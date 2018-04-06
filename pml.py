@@ -89,9 +89,9 @@ def main():
 
 	elif args["gen"]:
 
-		# generate xml
 		graph = load_graphml(args["<file.graphml>"])
-		generate_xml(args["<template.xml>"], graph)
+		xml = generate_xml(args["<template.xml>"], graph)
+		print xml
 
 	else:
 
