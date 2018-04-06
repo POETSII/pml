@@ -1,3 +1,4 @@
+from os import path
 from jinja2 import Template
 from graphs import get_edge_list
 
@@ -7,10 +8,16 @@ def load_text(file):
         return fid.read()
 
 
-def generate_xml(template_file, graph):
+def generate_xml(template, graph):
+    """Return an XML file (string) generated from 'graph' based on an XML
+    template 'template'.
 
-    template_str = load_text(template_file)
-    template = Template(template_str)
+    'template' can either be a filename or a template string."""
+
+    if path.isfile(template):
+        template_str = load_text(template)
+    else:
+        template_str = template
 
     # Create and pass a node_info dict instead of graph['node'] (this contains
     # node indices as well as node names). Pass graph['edges'] as is.
@@ -25,4 +32,4 @@ def generate_xml(template_file, graph):
         "edges": get_edge_list(graph)
     }
 
-    print template.render(**content)
+    return Template(template_str).render(**content)
