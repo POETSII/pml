@@ -41,7 +41,12 @@
                 <InputPin messageTypeId="__init__" name="__init__">
                     <OnReceive>
                         <![CDATA[
-                        if (deviceProperties->id == 1) {
+
+                        deviceState->state = 0;
+                        deviceState->counter = 0;
+
+                        if (deviceProperties->id == 0) {
+                            handler_log(2, "Start");
                             deviceState->rts = 1;
                         }
                         ]]>
@@ -51,11 +56,36 @@
                 <InputPin messageTypeId="toggle" name="in">
                     <OnReceive>
                         <![CDATA[
-                        deviceState->state = 1 - deviceState->state; // toggle state
 
-                        (deviceState->counter)++; // increment counter
+                        // Toggle state:
+                        deviceState->state = 1 - deviceState->state;
 
-                        deviceState->rts = 1; // queue next message for sending
+                        // Increment counter:
+                        (deviceState->counter)++;
+
+                        // Queue message for delivery if either:
+                        //   A. node is not root (id != 1)
+                        //   B. (node is root but) total messages delivered are less than a certain constant
+
+                        if (deviceProperties->id == 0) {
+
+                            // starting node propagate a fixed number of messages
+
+                            handler_log(2, "Cycle %d", deviceState->counter);
+
+                            if (deviceState->counter < 1000)
+                                deviceState->rts = 1; // queue next message
+                            else
+                                handler_log(2, "Finish");
+
+                        } else {
+
+                            // non-starting nodes always propagate incoming messages
+
+                            deviceState->rts = 1;
+
+                        }
+
                         ]]>
                     </OnReceive>
                 </InputPin>
