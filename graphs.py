@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 def reduce_graph(graph, predicate):
     """Return a subset of graph with predicate(node) = True."""
 
@@ -17,3 +19,14 @@ def get_edge_list(graph):
         for source, destinations in graph["edges"].iteritems()]
 
     return sum(sublists, [])  # return flattened list
+
+
+def get_edge_dict(edge_list):
+    """Return an edge dict given an input list of edges."""
+
+    edge_dict = defaultdict(list)
+
+    for src, dst in edge_list:
+        edge_dict[src].append(dst)
+
+    return edge_dict
