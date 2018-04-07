@@ -147,3 +147,4 @@ $RECYCLE.BIN/
 networks/*
 
 *.sublime-workspace
+xml/*
