@@ -6,7 +6,6 @@ from graphs import get_edge_dict
 from exporter import generate_xml
 from itertools import product
 
-
 usage = """gml.py
 
 Usage:

@@ -12,7 +12,7 @@ def get_lengths(digits=[1, 2, 5], exponents=range(7)):
 
     or similar, depending on 'digits' and 'exponents'."""
 
-    lengths = [dig*(10**expo) for dig, expo in product(digits, exponents)]
+    lengths = [dig * (10**expo) for dig, expo in product(digits, exponents)]
 
     return sorted(lengths)
 
