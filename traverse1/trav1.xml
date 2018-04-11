@@ -92,9 +92,9 @@
 
                 <ReadyToSend>
                     <![CDATA[
-                    handler_log(2, "msg_req_rts = %d", deviceState->msg_req_rts);
-                    handler_log(2, "msg_ack_rts = %d", deviceState->msg_ack_rts);
-                    *readyToSend = deviceState->msg_req_rts || deviceState->msg_ack_rts;;
+
+                        {{ include_file('ready_to_send.c') }}
+
                     ]]>
                 </ReadyToSend>
 
@@ -132,12 +132,7 @@
                     <OnSend>
                         <![CDATA[
 
-                        message->requester_id = deviceProperties->id;
-                        message->callback = deviceState->msg_req_callback;
-                        message->iteration = deviceState->msg_req_iteration;
-                        message->hoplimit = deviceState->msg_req_hoplimit;
-
-                        deviceState->msg_req_rts = 0;
+                        {{ include_file('send_req.c') }}
 
                         ]]>
                     </OnSend>
@@ -147,10 +142,7 @@
                     <OnSend>
                         <![CDATA[
 
-                        message->callback = deviceState->msg_ack_callback;
-                        message->discovered = deviceState->msg_ack_discovered;
-
-                        deviceState->msg_ack_rts = 0;
+                        {{ include_file('send_ack.c') }}
 
                         ]]>
                     </OnSend>
