@@ -1,0 +1,6 @@
+{
+	"sender_item_out, (message content = [0-9]+)": "blue bold",
+	"receiver_item_in, (message content = [0-9]+)": "green bold",
+	"Loading provider .*": "delete",
+	"  registerGraphType.*": "delete"
+}
