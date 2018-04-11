@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
+    <GraphType id="ro">
+        <Documentation>TODO</Documentation>
+        <MetaData>&quot;native_dimension&quot;:2</MetaData>
+        <Properties/>
+
+        <MessageTypes>
+
+            <MessageType id="__init__">
+                <Documentation>Initialize state</Documentation>
+            </MessageType>
+
+            <MessageType id="req">
+                <Message>
+                    <Scalar type="uint32_t" name="requester_id"><Documentation>Source node id</Documentation></Scalar>
+                    <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number to quote when sending ack</Documentation></Scalar>
+                    <Scalar type="uint32_t" name="iteration"><Documentation>Number of iteration the request belongs to</Documentation></Scalar>
+                    <Scalar type="uint32_t" name="hoplimit"><Documentation>How many further steps to propagate request</Documentation></Scalar>
+                </Message>
+                <Documentation>Request to traverse surrounding nodes</Documentation>
+            </MessageType>
+
+            <MessageType id="ack">
+                <Message>
+                    <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number</Documentation></Scalar>
+                    <Scalar type="uint32_t" name="discovered"><Documentation>How many new nodes have been discovered</Documentation></Scalar>
+                </Message>
+                <Documentation>Acknowledge completion of a traversal request</Documentation>
+            </MessageType>
+
+        </MessageTypes>
+
+        <DeviceTypes>
+            <DeviceType id="node">
+
+                <Properties>
+                    <Scalar name="id" type="uint32_t"/>
+                </Properties>
+
+                <State>
+                    <Scalar name="req_counter" type="uint32_t"/>
+                    <Array name="hoplimits" type="uint32_t" length="100"/>
+
+                    <!--
+
+                    Requests Table [requests_tbl] is a table of request
+                    entries. Each entry consists of the fields:
+
+                    - discovered_sum: sum of nodes discovered via this request (running sum).
+                    - replies_received: number of ack messages received
+                    - requester: id of requesting node
+                    - callback: callback number to quote when sending ack to 'requester'
+
+                    New entries are inserted on the first available slot in
+                    the table (O(n) insertion, but will do for now). An
+                    additional field 'occupied' indicates whether the slot is
+                    used.
+
+                     -->
+
+                    <Array name="requests_tbl_occupied" type="uint32_t" length="1000"/>
+                    <Array name="requests_tbl_discovered_sum" type="uint32_t" length="1000"/>
+                    <Array name="requests_tbl_replies_received" type="uint32_t" length="1000"/>
+                    <Array name="requests_tbl_requester" type="uint32_t" length="1000"/>
+                    <Array name="requests_tbl_callback" type="uint32_t" length="1000"/>
+
+                    <!--
+
+                    Temporary variables to pass req message fields to rew
+                    output handler:
+
+                     -->
+
+                    <Scalar name="msg_req_rts" type="uint32_t"/>
+                    <Scalar name="msg_req_callback" type="int32_t"/>
+                    <Scalar name="msg_req_iteration" type="uint32_t"/>
+                    <Scalar name="msg_req_hoplimit" type="uint32_t"/>
+
+                    <!--
+
+                    Temporary variables to pass req message fields to ack
+                    output handler:
+
+                     -->
+
+                    <Scalar name="msg_ack_rts" type="uint32_t"/>
+                    <Scalar name="msg_ack_callback" type="uint32_t"/>
+                    <Scalar name="msg_ack_discovered" type="uint32_t"/>
+
+                </State>
+
+                <ReadyToSend>
+                    <![CDATA[
+                    handler_log(2, "msg_req_rts = %d", deviceState->msg_req_rts);
+                    handler_log(2, "msg_ack_rts = %d", deviceState->msg_ack_rts);
+                    *readyToSend = deviceState->msg_req_rts || deviceState->msg_ack_rts;;
+                    ]]>
+                </ReadyToSend>
+
+                <InputPin messageTypeId="__init__" name="__init__">
+                    <OnReceive>
+                        <![CDATA[
+
+                        {{ include_file('init.c') }}
+
+                        ]]>
+                    </OnReceive>
+                </InputPin>
+
+                <InputPin messageTypeId="req" name="req_in">
+                    <OnReceive>
+                        <![CDATA[
+
+                        {{ include_file('receive_req.c') }}
+
+                        ]]>
+                    </OnReceive>
+                </InputPin>
+
+                <InputPin messageTypeId="ack" name="ack_in">
+                    <OnReceive>
+                        <![CDATA[
+
+                        {{ include_file('receive_ack.c') }}
+
+                        ]]>
+                    </OnReceive>
+                </InputPin>
+
+                <OutputPin messageTypeId="req" name="req_out">
+                    <OnSend>
+                        <![CDATA[
+
+                        message->requester_id = deviceProperties->id;
+                        message->callback = deviceState->msg_req_callback;
+                        message->iteration = deviceState->msg_req_iteration;
+                        message->hoplimit = deviceState->msg_req_hoplimit;
+
+                        deviceState->msg_req_rts = 0;
+
+                        ]]>
+                    </OnSend>
+                </OutputPin>
+
+                <OutputPin messageTypeId="ack" name="ack_out">
+                    <OnSend>
+                        <![CDATA[
+
+                        message->callback = deviceState->msg_ack_callback;
+                        message->discovered = deviceState->msg_ack_discovered;
+
+                        deviceState->msg_ack_rts = 0;
+
+                        ]]>
+                    </OnSend>
+                </OutputPin>
+
+            </DeviceType>
+
+        </DeviceTypes>
+    </GraphType>
+    <GraphInstance id="graph1" graphTypeId="ro">
+      <DeviceInstances>
+          <DevI id="n0" type="node"><P>"id": 0</P></DevI>
+          <DevI id="n1" type="node"><P>"id": 1</P></DevI>
+          <DevI id="n2" type="node"><P>"id": 2</P></DevI>
+          <DevI id="n3" type="node"><P>"id": 3</P></DevI>
+          <DevI id="n4" type="node"><P>"id": 4</P></DevI>
+      </DeviceInstances>
+      <EdgeInstances>
+          <EdgeI path="n1:req_in-n0:req_out"/>
+          <EdgeI path="n2:req_in-n1:req_out"/>
+          <EdgeI path="n0:ack_in-n1:ack_out"/>
+      </EdgeInstances>
+    </GraphInstance>
+</Graphs>
