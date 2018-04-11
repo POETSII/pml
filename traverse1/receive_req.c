@@ -7,7 +7,7 @@ handler_log(2, "received msg from %d, iteration = %d, hoplimit = %d",
     message->iteration,
     message->hoplimit);
 
-int min_hoplimit = deviceState->hoplimits[message->iteration];
+uint32_t min_hoplimit = deviceState->hoplimits[message->iteration];
 
 if (message->hoplimit > min_hoplimit) {
 
