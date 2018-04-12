@@ -3,7 +3,7 @@
 deviceState->msg_req_rts = 0;
 
 handler_log(2, "received msg from %d, iteration = %d, hoplimit = %d",
-    message->requester_id,
+    message->src,
     message->iteration,
     message->hoplimit);
 
@@ -34,7 +34,7 @@ if (message->hoplimit > min_hoplimit) {
     // 1b. Insert new requests entry
 
     deviceState->requests_tbl_occupied[req_ind]         = 1;
-    deviceState->requests_tbl_requester[req_ind]        = message->requester_id;
+    deviceState->requests_tbl_requester[req_ind]        = message->src;
     deviceState->requests_tbl_callback[req_ind]         = message->callback;
     deviceState->requests_tbl_replies_received[req_ind] = 0;
     deviceState->requests_tbl_discovered_sum[req_ind]   = 0;
@@ -61,6 +61,7 @@ if (message->hoplimit > min_hoplimit) {
     int discovered = 0; // TODO
 
     deviceState->msg_ack_rts = 1;
+    deviceState->msg_ack_dst = message->src;
     deviceState->msg_ack_callback = message->callback;
     deviceState->msg_ack_discovered = discovered;
 

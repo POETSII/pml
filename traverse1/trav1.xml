@@ -13,7 +13,7 @@
 
             <MessageType id="req">
                 <Message>
-                    <Scalar type="uint32_t" name="requester_id"><Documentation>Source node id</Documentation></Scalar>
+                    <Scalar type="uint32_t" name="src"><Documentation>Source node id</Documentation></Scalar>
                     <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number to quote when sending ack</Documentation></Scalar>
                     <Scalar type="uint32_t" name="iteration"><Documentation>Number of iteration the request belongs to</Documentation></Scalar>
                     <Scalar type="uint32_t" name="hoplimit"><Documentation>How many further steps to propagate request</Documentation></Scalar>
@@ -23,6 +23,7 @@
 
             <MessageType id="ack">
                 <Message>
+                    <Scalar type="uint32_t" name="dst"><Documentation>Destination node id</Documentation></Scalar>
                     <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number</Documentation></Scalar>
                     <Scalar type="uint32_t" name="discovered"><Documentation>How many new nodes have been discovered</Documentation></Scalar>
                 </Message>
@@ -36,6 +37,7 @@
 
                 <Properties>
                     <Scalar name="id" type="uint32_t"/>
+                    <Scalar name="outdegree" type="uint32_t"/>
                 </Properties>
 
                 <State>
@@ -85,6 +87,7 @@
                      -->
 
                     <Scalar name="msg_ack_rts" type="uint32_t"/>
+                    <Scalar name="msg_ack_dst" type="uint32_t"/>
                     <Scalar name="msg_ack_callback" type="uint32_t"/>
                     <Scalar name="msg_ack_discovered" type="uint32_t"/>
 
@@ -154,16 +157,19 @@
     </GraphType>
     <GraphInstance id="graph1" graphTypeId="ro">
       <DeviceInstances>
-          <DevI id="n0" type="node"><P>"id": 0</P></DevI>
-          <DevI id="n1" type="node"><P>"id": 1</P></DevI>
-          <DevI id="n2" type="node"><P>"id": 2</P></DevI>
-          <DevI id="n3" type="node"><P>"id": 3</P></DevI>
-          <DevI id="n4" type="node"><P>"id": 4</P></DevI>
+          <DevI id="n0" type="node"><P>"id": 0, "outdegree": 1</P></DevI>
+          <DevI id="n1" type="node"><P>"id": 1, "outdegree": 2</P></DevI>
+          <DevI id="n2" type="node"><P>"id": 2, "outdegree": 0</P></DevI>
+          <DevI id="n3" type="node"><P>"id": 3, "outdegree": 0</P></DevI>
       </DeviceInstances>
       <EdgeInstances>
           <EdgeI path="n1:req_in-n0:req_out"/>
           <EdgeI path="n2:req_in-n1:req_out"/>
+          <EdgeI path="n3:req_in-n1:req_out"/>
+
           <EdgeI path="n0:ack_in-n1:ack_out"/>
+          <EdgeI path="n1:ack_in-n2:ack_out"/>
+          <EdgeI path="n1:ack_in-n3:ack_out"/>
       </EdgeInstances>
     </GraphInstance>
 </Graphs>
