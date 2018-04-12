@@ -36,6 +36,10 @@ class Graph():
 
         namespaces = {"graphml": "http://graphml.graphdrawing.org/xmlns"}
 
+        edge_default = root.attrib.get("edgedefault", "directed")
+
+        is_directed = edge_default == "directed"
+
         self.nodes = {
             node.attrib["id"]
             for node in root.findall("graphml:node", namespaces)
@@ -46,7 +50,13 @@ class Graph():
             for e in root.findall("graphml:edge", namespaces)
         ]
 
-        self.set_edge_list(edge_list)
+        if is_directed:
+            complete_list = edge_list
+        else:
+            flipped_list = [(dst, src) for src, dst in edge_list]
+            complete_list = edge_list + flipped_list
+
+        self.set_edge_list(complete_list)
 
     def set_edge_list(self, edge_list):
         self.edges =defaultdict(set)
