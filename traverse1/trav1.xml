@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
-    <GraphType id="ro">
+    <GraphType id="network">
         <Documentation>TODO</Documentation>
         <MetaData>&quot;native_dimension&quot;:2</MetaData>
         <Properties/>
@@ -155,21 +155,20 @@
 
         </DeviceTypes>
     </GraphType>
-    <GraphInstance id="graph1" graphTypeId="ro">
+    <GraphInstance id="graph1" graphTypeId="network">
       <DeviceInstances>
-          <DevI id="n0" type="node"><P>"id": 0, "outdegree": 1</P></DevI>
-          <DevI id="n1" type="node"><P>"id": 1, "outdegree": 2</P></DevI>
-          <DevI id="n2" type="node"><P>"id": 2, "outdegree": 0</P></DevI>
-          <DevI id="n3" type="node"><P>"id": 3, "outdegree": 0</P></DevI>
+          {%- for index, node in graph.get_node_list() %}
+          <DevI id="{{ node.name }}" type="node">
+            <P>"id": {{ index }}, "outdegree": {{ graph.get_outdegree(node) }}</P>
+          </DevI>
+          {%- endfor %}
       </DeviceInstances>
       <EdgeInstances>
-          <EdgeI path="n1:req_in-n0:req_out"/>
-          <EdgeI path="n2:req_in-n1:req_out"/>
-          <EdgeI path="n3:req_in-n1:req_out"/>
-
-          <EdgeI path="n0:ack_in-n1:ack_out"/>
-          <EdgeI path="n1:ack_in-n2:ack_out"/>
-          <EdgeI path="n1:ack_in-n3:ack_out"/>
+        {%- for src, dst in graph.get_edge_list() %}
+          <!-- Node {{src }} to {{ dst }}  -->
+          <EdgeI path="{{ dst }}:req_in-{{ src }}:req_out"/>
+          <EdgeI path="{{ src }}:ack_in-{{ dst }}:ack_out"/>
+        {%- endfor %}
       </EdgeInstances>
     </GraphInstance>
 </Graphs>

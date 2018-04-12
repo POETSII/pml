@@ -1,7 +1,5 @@
-from os import path
-from jinja2 import Template
-from graphs import get_edge_list
-
+import jinja2
+import os
 
 def load_text(file):
     with open(file, "r") as fid:
@@ -9,27 +7,39 @@ def load_text(file):
 
 
 def generate_xml(template, graph):
-    """Return an XML file (string) generated from 'graph' based on an XML
-    template 'template'.
+    """Generate xml string from xml template and graph object.
 
     'template' can either be a filename or a template string."""
 
-    if path.isfile(template):
-        template_str = load_text(template)
-    else:
-        template_str = template
+    is_file = os.path.isfile(template)
 
-    # Create and pass a node_info dict instead of graph['node'] (this contains
-    # node indices as well as node names). Pass graph['edges'] as is.
+    template_str = load_text(template) if is_file else template
+    template_dir = os.path.split(template)[0] if is_file else '.'
+
+    # Create jinja template content
 
     node_info = [
         {"name": name, "index": ind}
-        for ind, name in enumerate(graph["nodes"])
+        for ind, name in enumerate(graph.nodes)
     ]
 
     content = {
         "node_info": node_info,
-        "edges": get_edge_list(graph)
+        "edges": graph.get_edge_list(),
+        "graph": graph
     }
 
-    return Template(template_str).render(**content)
+    # Prepare jinja environment (with include_file function)
+
+    def include_file(file):
+        full_file = os.path.join(template_dir, file)
+        with open(full_file, "r") as fid:
+            return fid.read()
+
+    loader = jinja2.PackageLoader(__name__, '')
+    env = jinja2.Environment(loader=loader)
+    env.globals['include_file'] = include_file
+
+    # Return rendered template
+
+    return env.get_template(template).render(**content)
