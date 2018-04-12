@@ -149,3 +149,4 @@ networks/*
 *.sublime-workspace
 xml/*
 old
+tmp

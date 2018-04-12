@@ -1,43 +1,26 @@
-import os
-import jinja2
-
-from random import sample
-from string import lowercase
+from graph import Graph
+from exporter import generate_xml
 from fabric.api import run
-from fabric.api import sudo
 from fabric.api import cd
 from fabric.api import env
 from fabric.state import output
 from fabric.operations import put
-from fabric.operations import get
-from fabric.contrib.files import exists
 
 output["status"]   = False
 output["running"]  = False
 env.output_prefix  = False
 env.use_ssh_config = True
 
-def sim(template):
-    """Prepare XML file."""
+def sim(template, graphml):
+    """Run (remote) simulation using template and graphml files."""
 
-    temp_output = '/tmp/output.xml'
-    template_path = os.path.abspath(template)
-    template_dir, template_file = os.path.split(template_path)
+    # Prepare flat xml file (tmp_output)
+    temp_output = 'tmp/output.xml'
+    graph = Graph(graphml)
+    xml = generate_xml(template, graph)
+    write_file(xml, temp_output)
 
-    def include_file(file):
-        """Return the text content of a 'file' inside template_dir."""
-
-        full_file = os.path.join(template_dir, file)
-        with open(full_file, "r") as fid:
-            return fid.read()
-
-    loader = jinja2.PackageLoader(__name__, '')
-    env = jinja2.Environment(loader=loader)
-    env.globals['include_file'] = include_file
-
-    content = env.get_template(template).render()
-    write_file(content, temp_output)
-
+    # Put file on remote machine and simulate
     put(temp_output, "/tmp/input.xml")
     run_script("simulate.sh")
 
