@@ -1,17 +1,14 @@
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 
-class Graph():
 
+class Graph():
     def __init__(self, *args):
         # Supports two types of initialization:
         # 1. Graph(graphml_file)
         # 2. Graph(nodes, edges)
 
-        handlers = {
-            1: self.__init_graphml__,
-            2: self.__init_nodes_edges__
-        }
+        handlers = {1: self.__init_graphml__, 2: self.__init_nodes_edges__}
 
         def raise_invalid(*_):
             raise Exception("Invalid constructor arguments")
@@ -45,10 +42,8 @@ class Graph():
             for node in root.findall("graphml:node", namespaces)
         }
 
-        edge_list = [
-            (e.attrib["source"], e.attrib["target"])
-            for e in root.findall("graphml:edge", namespaces)
-        ]
+        edge_list = [(e.attrib["source"], e.attrib["target"])
+                     for e in root.findall("graphml:edge", namespaces)]
 
         if is_directed:
             complete_list = edge_list
@@ -59,7 +54,7 @@ class Graph():
         self.set_edge_list(complete_list)
 
     def set_edge_list(self, edge_list):
-        self.edges =defaultdict(set)
+        self.edges = defaultdict(set)
 
         for src, dst in edge_list:
             self.edges[src].add(dst)
@@ -69,10 +64,8 @@ class Graph():
 
         nodes = filter(predicate, self.nodes)
 
-        edge_list = [
-            (src, dst) for src, dst in self.get_edge_list()
-            if (src in nodes and dst in nodes)
-            ]
+        edge_list = [(src, dst) for src, dst in self.get_edge_list()
+                     if (src in nodes and dst in nodes)]
 
         return Graph(nodes, edge_list)
 
