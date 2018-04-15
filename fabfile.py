@@ -32,8 +32,8 @@ def write_file(text, file):
 
 def run_script(script_file, quiet=False):
     local_file = "scripts/%s" % script_file
-    put(local_file, "/home/vagrant", mirror_local_mode=True)
-    with cd("/home/vagrant"):
+    put(local_file, "/tmp", mirror_local_mode=True)
+    with cd("/tmp"):
         quiet_str = ">/dev/null 2>&1" if quiet else ""
         run("./%s %s" % (script_file, quiet_str))
         run("rm ./%s" % script_file)
