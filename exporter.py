@@ -33,8 +33,7 @@ def generate_xml(template, graph):
 
     def include_file(file):
         full_file = os.path.join(template_dir, file)
-        with open(full_file, "r") as fid:
-            return fid.read()
+        return generate_xml(full_file, graph)
 
     loader = jinja2.PackageLoader(__name__, '')
     env = jinja2.Environment(loader=loader)
