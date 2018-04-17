@@ -3,13 +3,10 @@
 import json
 
 from apl import get_apl
-# from graphs import reduce_graph
-# from graphs import get_edge_list
+from graph import Graph
 from docopt import docopt
 from random import sample
 from random import randrange
-# from graphml import load_graphml
-from graph import Graph
 from exporter import generate_xml
 from multiprocessing import Pool
 
