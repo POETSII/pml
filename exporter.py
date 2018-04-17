@@ -6,7 +6,7 @@ def load_text(file):
         return fid.read()
 
 
-def generate_xml(template, graph):
+def generate_xml(template, graph, content=dict()):
     """Generate xml string from xml template and graph object.
 
     'template' can either be a filename or a template string."""
@@ -18,27 +18,39 @@ def generate_xml(template, graph):
 
     # Create jinja template content
 
-    node_info = [
-        {"name": name, "index": ind}
-        for ind, name in enumerate(graph.nodes)
-    ]
+    content = join_dicts({"graph": graph}, content)
 
-    content = {
-        "node_info": node_info,
-        "edges": graph.get_edge_list(),
-        "graph": graph
-    }
+    # Define custom jinja function 'include'
 
-    # Prepare jinja environment (with include_file function)
+    def include_file(file, **kwargs):
+        """Include file in jinja template."""
 
-    def include_file(file):
+        # Determine absolute path of included file
         full_file = os.path.join(template_dir, file)
-        return generate_xml(full_file, graph)
+
+        # Create 'inner_content', a copy of 'content' merged with the named
+        # arguments of 'include'.
+        inner_content = join_dicts(content, kwargs)
+
+        # Generate result (recursively) using generate_xml
+        return generate_xml(full_file, graph, inner_content)
+
+    # Prepare jinja environment
 
     loader = jinja2.PackageLoader(__name__, '')
     env = jinja2.Environment(loader=loader)
     env.globals['include'] = include_file
 
     # Return rendered template
-
     return env.get_template(template).render(**content)
+
+
+def join_dicts(*dicts):
+    """Return a sum of dictionaries."""
+
+    result = dicts[0]
+
+    for d in dicts[1:]:
+        result = dict(result, **d)
+
+    return result
