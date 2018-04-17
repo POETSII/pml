@@ -23,6 +23,7 @@
 
             <MessageType id="ack">
                 <Message>
+                    <Scalar type="uint32_t" name="src"><Documentation>Source node id</Documentation></Scalar>
                     <Scalar type="uint32_t" name="dst"><Documentation>Destination node id</Documentation></Scalar>
                     <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number</Documentation></Scalar>
                     <Scalar type="uint32_t" name="discovered"><Documentation>How many new nodes have been discovered</Documentation></Scalar>

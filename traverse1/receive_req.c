@@ -48,6 +48,10 @@ if (message->hoplimit > min_hoplimit) {
     deviceState->msg_req_callback = req_ind;
     deviceState->msg_req_hoplimit = message->hoplimit - 1;
 
+    // Finally, update hoplimits table
+
+    deviceState->hoplimits[message->iteration] = message->hoplimit;
+
 } else {
 
     // Either:
@@ -56,7 +60,7 @@ if (message->hoplimit > min_hoplimit) {
 
     // Send an ack message back
 
-    handler_log(2, "Sending ack message back ...");
+    handler_log(2, "Sending ack message back to %d ...", message->src);
 
     int discovered = 0; // TODO
 

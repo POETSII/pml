@@ -2,5 +2,11 @@
 	"sender_item_out, (message content = [0-9]+)": "blue bold",
 	"receiver_item_in, (message content = [0-9]+)": "green bold",
 	"Loading provider .*": "delete",
-	"  registerGraphType.*": "delete"
+	"  registerGraphType.*": "delete",
+	"Received all replies.*": "green bold",
+	"Inserted new entry.*": "red bold",
+	"Sending ack message back.*": "bold",
+	"Traversal completed": "blue bold",
+	"received ack from.*": "green bold",
+	"Start": "blue bold"
 }

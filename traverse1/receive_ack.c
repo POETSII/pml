@@ -3,10 +3,11 @@ if (message->dst != deviceProperties->id)
 
 uint32_t ind = message->callback;
 
-handler_log(2, "received ack, callback = %d", ind);
+handler_log(2, "received ack from %d (callback %d)", message->src, ind);
 
 if (deviceState->requests_tbl_occupied[ind] == 0) {
 	handler_log(2, "Error, invalid callback! Slot %d in requests table is empty", ind);
+	handler_exit(1);
 }
 
 uint32_t replies = ++(deviceState->requests_tbl_replies_received[ind]);
@@ -31,7 +32,7 @@ if (replies == required_replies) {
 
 	} else {
 
-		handler_log(2, "Received all replies, sending ack back to parent (id = %d) ...", parent);
+		handler_log(2, "Received all replies, sending ack back to parent %d (callback %d) ...", parent, callback);
 
 		deviceState->msg_ack_rts = 1;
 		deviceState->msg_ack_callback = callback;

@@ -24,9 +24,15 @@ if (deviceProperties->id == 0) {
 
     // Now broadcast a request to neighbours
 
+    uint32_t iteration = 3;
+
     deviceState->msg_req_rts = 1;
     deviceState->msg_req_callback = 0; // index of root request object in requests table
-    deviceState->msg_req_iteration = 2;
-    deviceState->msg_req_hoplimit = deviceState->msg_req_iteration - 1;
+    deviceState->msg_req_iteration = iteration;
+    deviceState->msg_req_hoplimit = iteration - 1;
+
+    // Set hoplimit of this iteration manually
+
+    deviceState->hoplimits[iteration] = iteration;
 
 }
