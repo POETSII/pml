@@ -97,7 +97,7 @@
                 <ReadyToSend>
                     <![CDATA[
 
-{{ include_file('ready_to_send.c') }}
+{{ include('ready_to_send.c') }}
 
                     ]]>
                 </ReadyToSend>
@@ -106,7 +106,7 @@
                     <OnReceive>
                         <![CDATA[
 
-{{ include_file('init.c') }}
+{{ include('init.c') }}
 
                         ]]>
                     </OnReceive>
@@ -116,7 +116,7 @@
                     <OnReceive>
                         <![CDATA[
 
-{{ include_file('receive_req.c') }}
+{{ include('receive_req.c') }}
 
                         ]]>
                     </OnReceive>
@@ -126,7 +126,7 @@
                     <OnReceive>
                         <![CDATA[
 
-{{ include_file('receive_ack.c') }}
+{{ include('receive_ack.c') }}
 
                         ]]>
                     </OnReceive>
@@ -136,7 +136,7 @@
                     <OnSend>
                         <![CDATA[
 
-{{ include_file('send_req.c') }}
+{{ include('send_req.c') }}
 
                         ]]>
                     </OnSend>
@@ -146,7 +146,7 @@
                     <OnSend>
                         <![CDATA[
 
-{{ include_file('send_ack.c') }}
+{{ include('send_ack.c') }}
 
                         ]]>
                     </OnSend>

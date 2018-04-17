@@ -37,7 +37,7 @@ def generate_xml(template, graph):
 
     loader = jinja2.PackageLoader(__name__, '')
     env = jinja2.Environment(loader=loader)
-    env.globals['include_file'] = include_file
+    env.globals['include'] = include_file
 
     # Return rendered template
 
