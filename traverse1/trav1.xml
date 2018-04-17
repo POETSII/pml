@@ -158,9 +158,9 @@
     </GraphType>
     <GraphInstance id="graph1" graphTypeId="network">
       <DeviceInstances>
-          {%- for index, node in graph.get_node_list() %}
+          {%- for node in graph.nodes %}
           <DevI id="{{ node }}" type="node">
-            <P>"id": {{ index }}, "outdegree": {{ graph.get_outdegree(node) }}</P>
+            <P>"id": {{ loop.index0 }}, "outdegree": {{ graph.get_outdegree(node) }}</P>
           </DevI>
           {%- endfor %}
       </DeviceInstances>

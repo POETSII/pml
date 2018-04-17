@@ -77,9 +77,6 @@ class Graph():
                 result.append((src, dst))
         return result
 
-    def get_node_list(self):
-        return enumerate(self.nodes)
-
     def get_outdegree(self, node):
         """Return outdegree of a node."""
         return len(self.edges[node])
