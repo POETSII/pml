@@ -72,9 +72,4 @@ if (message->hoplimit > min_hoplimit) {
 
     send_ack(deviceState, &outgoing);
 
-    // deviceState->msg_ack_rts = 1;
-    // deviceState->msg_ack_dst = message->src;
-    // deviceState->msg_ack_callback = message->callback;
-    // deviceState->msg_ack_discovered = discovered;
-
 }

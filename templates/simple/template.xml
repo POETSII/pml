@@ -22,6 +22,16 @@
                 <Documentation>{{ content['doc'] }}</Documentation>
                 {%- if content.get('fields') %}
                 <Message>
+                    <Scalar type="uint32_t" name="src">
+                        <Documentation>
+                            Source node id
+                        </Documentation>
+                    </Scalar>
+                    <Scalar type="uint32_t" name="dst">
+                        <Documentation>
+                            Destination node id
+                        </Documentation>
+                    </Scalar>
                     {%- for fd_id, fd_content in content['fields'].items() %}
                     {%- set fd_type = fd_content.get('type', 'uint32_t') %}
                     <Scalar type="{{ fd_type }}" name="{{ fd_id }}">
@@ -69,14 +79,14 @@
                     {%- endfor %}
 
                     {% for id, content in messages.items() %}
-                    {%- if content.get('fields') %}
                     <!-- Software buffer for (outgoing) {{ id }} messages: -->
 
+                    <Array name="{{ id }}_buffer_src" type="uint32_t" length="1000"></Array>
+                    <Array name="{{ id }}_buffer_dst" type="uint32_t" length="1000"></Array>
                     <Scalar name="{{ id }}_buffer_ptr" type="uint32_t"></Scalar>
                     {%- for fd_id, fd_content in content['fields'].items() %}
                     <Array name="{{ id }}_buffer_{{ fd_id }}" type="{{ fd_content.get('type', 'uint32_t') }}" length="1000"></Array>
                     {%- endfor %}
-                    {%- endif %}
                     {% endfor %}
 
                 </State>

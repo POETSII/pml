@@ -6,9 +6,6 @@
         "req": {
             "doc": "Request a node to traverse its neighbours",
             "fields": {
-                "src": {
-                    "doc": "Source node id"
-                },
                 "callback": {
                     "doc": "Callback ticket number to quote when sending ack"
                 },
@@ -23,12 +20,6 @@
         "ack": {
             "doc": "Acknowledge completion of a traversal request",
             "fields": {
-                "src": {
-                    "doc": "Source node id"
-                },
-                "dst": {
-                    "doc": "Destination node id"
-                },
                 "callback": {
                     "doc": "Callback ticket number"
                 },
