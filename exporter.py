@@ -15,7 +15,7 @@ def get_path(file, parent_file):
     return os.path.join(parent_dir, file)
 
 
-def generate_xml(template, graph, content=dict()):
+def generate_xml(template, graph, env_globals=dict(), content=dict()):
     """Generate xml string from xml template and graph object.
 
     'template' can either be a filename or a template string."""
@@ -31,7 +31,7 @@ def generate_xml(template, graph, content=dict()):
 
     # Define custom jinja function 'include'
 
-    def include_file(file, **kwargs):
+    def include_template_file(file, **kwargs):
         """Include file in jinja template."""
 
         # Determine absolute path of included file
@@ -42,13 +42,13 @@ def generate_xml(template, graph, content=dict()):
         inner_content = join_dicts(content, kwargs)
 
         # Generate result (recursively) using generate_xml
-        return generate_xml(full_file, graph, inner_content)
+        return generate_xml(full_file, graph, env_globals, inner_content)
 
     # Prepare jinja environment
-
     loader = jinja2.PackageLoader(__name__, '')
     env = jinja2.Environment(loader=loader)
-    env.globals['include'] = include_file
+    env.globals['include'] = include_template_file
+    env.globals.update(env_globals)
 
     # Return rendered template
     return env.get_template(template).render(**content)

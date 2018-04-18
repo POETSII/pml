@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import json
 
 from apl import get_apl
@@ -103,16 +104,32 @@ def main():
 
 
 def build(app_file, graphml_file):
-	app = read_json(app_file)
+
+	def include_app_file(file, optional=False):
+	    full_file = get_path(file, app_file)
+	    if os.path.isfile(full_file):
+	    	return generate_xml(full_file, graph, content)
+	    elif optional:
+	    	return ''
+	    else:
+	    	raise Exception('Required file %s not found' % file)
+
+	content = read_json(app_file)
 	graph = Graph(graphml_file)
-	template = get_path(app["template"], app_file)
-	xml = generate_xml(template, graph, app)
+	template = 'templates/%s/template.xml' % content["template"]
+	env_globals = {'include_app': include_app_file}
+	xml = generate_xml(template, graph, env_globals, content)
 	return xml
 
 
 def read_json(file):
     with open(file, "r") as fid:
         return json.load(fid)
+
+
+def read_plain(file):
+	with open(file, 'r') as fid:
+		return fid.read()
 
 
 def get_impact(graph, disabled):

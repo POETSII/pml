@@ -1,6 +1,6 @@
 {
     "type": "network",
-    "template": "trav1.xml",
+    "template": "simple",
     "doc": "Network Traversal Application",
     "messages": {
         "req": {
@@ -39,7 +39,7 @@
         }
     },
     "device": {
-    	"name": "node",
+        "name": "node",
         "properties": {
             "id": {},
             "outdegree": {}

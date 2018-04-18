@@ -90,7 +90,7 @@
                     <OnReceive>
                         <![CDATA[
 
-                        {{ include('receive_%s.c' % msg) }}
+                        {{ include_app('receive_%s.c' % msg) }}
 
                         ]]>
                     </OnReceive>
@@ -100,7 +100,7 @@
                     <OnSend>
                         <![CDATA[
 
-                        {{ include('send_%s.c' % msg) }}
+                        {{ include_app('send_%s.c' % msg) }}
 
                         ]]>
                     </OnSend>
