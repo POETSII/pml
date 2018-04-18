@@ -12,6 +12,8 @@ if (deviceProperties->id == 0) {
 
     handler_log(2, "Start");
 
+    handler_log(2, "sum(3+5) = %d", sum(3, 5));
+
     // Insert a dummy request entry in the requests table to kick-start the
     // traversal process. The entry is marked as root by setting callback = -1
     // and it is inserted at index 0 in the table.

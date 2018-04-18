@@ -1,5 +1,5 @@
+from pml import build
 from graph import Graph
-from exporter import generate_xml
 from fabric.api import run
 from fabric.api import cd
 from fabric.api import env
@@ -11,13 +11,12 @@ output["running"]  = False
 env.output_prefix  = False
 env.use_ssh_config = True
 
-def sim(template, graphml):
-    """Run (remote) simulation using template and graphml files."""
+def sim(app, graphml):
+    """Run (remote) simulation using app and graphml files."""
 
     # Prepare flat xml file (tmp_output)
     temp_output = 'tmp/output.xml'
-    graph = Graph(graphml)
-    xml = generate_xml(template, graph)
+    xml = build(app, graphml)
     write_file(xml, temp_output)
 
     # Put file on remote machine and simulate

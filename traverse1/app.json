@@ -1,0 +1,77 @@
+{
+    "type": "network",
+    "template": "trav1.xml",
+    "doc": "Network Traversal Application",
+    "messages": {
+        "req": {
+            "doc": "Request a node to traverse its neighbours",
+            "fields": {
+                "src": {
+                    "doc": "Source node id"
+                },
+                "callback": {
+                    "doc": "Callback ticket number to quote when sending ack"
+                },
+                "iteration": {
+                    "doc": "Number of iteration the request belongs to"
+                },
+                "hoplimit": {
+                    "doc": "How many further steps to propagate request"
+                }
+            }
+        },
+        "ack": {
+            "doc": "Acknowledge completion of a traversal request",
+            "fields": {
+                "src": {
+                    "doc": "Source node id"
+                },
+                "dst": {
+                    "doc": "Destination node id"
+                },
+                "callback": {
+                    "doc": "Callback ticket number"
+                },
+                "discovered": {
+                    "doc": "How many new nodes have been discovered"
+                }
+            }
+        }
+    },
+    "device": {
+    	"name": "node",
+        "properties": {
+            "id": {},
+            "outdegree": {}
+        },
+        "state": {
+            "req_counter": {},
+            "hoplimits": {
+                "length": 100
+            },
+            "requests_tbl_occupied": {
+                "length": 1000
+            },
+            "requests_tbl_discovered_sum": {
+                "length": 1000
+            },
+            "requests_tbl_replies_received": {
+                "length": 1000
+            },
+            "requests_tbl_requester": {
+                "length": 1000
+            },
+            "requests_tbl_callback": {
+                "length": 1000
+            },
+            "msg_req_rts": {},
+            "msg_req_callback": {},
+            "msg_req_iteration": {},
+            "msg_req_hoplimit": {},
+            "msg_ack_rts": {},
+            "msg_ack_dst": {},
+            "msg_ack_callback": {},
+            "msg_ack_discovered": {}
+        }
+    }
+}

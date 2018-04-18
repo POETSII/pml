@@ -8,6 +8,7 @@ from docopt import docopt
 from random import sample
 from random import randrange
 from exporter import generate_xml
+from exporter import get_path
 from multiprocessing import Pool
 
 
@@ -18,6 +19,7 @@ Usage:
   pml.py [options] apl enable <node_list> <file.graphml>
   pml.py [options] apl disable <node_list> <file.graphml>
   pml.py [options] gen <template.xml> <file.graphml>
+  pml.py [options] build <app.json> <file.graphml>
   pml.py [options] impact <node_count> <trials> <file.graphml>
 
 Options:
@@ -91,9 +93,26 @@ def main():
 		xml = generate_xml(args["<template.xml>"], graph)
 		print xml
 
+	elif args["build"]:
+
+		print build(args["<app.json>"], args["<file.graphml>"])
+
 	else:
 
 		print get_apl(graph, verbose=args["--info"])
+
+
+def build(app_file, graphml_file):
+	app = read_json(app_file)
+	graph = Graph(graphml_file)
+	template = get_path(app["template"], app_file)
+	xml = generate_xml(template, graph, app)
+	return xml
+
+
+def read_json(file):
+    with open(file, "r") as fid:
+        return json.load(fid)
 
 
 def get_impact(graph, disabled):

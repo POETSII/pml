@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 <Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
-    <GraphType id="network">
-        <Documentation>TODO</Documentation>
+    <GraphType id="{{ type }}">
+        <Documentation>{{ doc }}</Documentation>
         <MetaData>&quot;native_dimension&quot;:2</MetaData>
         <Properties/>
+
+        <SharedCode><![CDATA[
+
+        {{ include('shared.c') }}
+
+        ]]></SharedCode>
 
         <MessageTypes>
 
@@ -11,93 +17,59 @@
                 <Documentation>Initialize state</Documentation>
             </MessageType>
 
-            <MessageType id="req">
+            {% for id, content in messages.items() %}
+            <MessageType id="{{ id }}">
+                <Documentation>{{ content['doc'] }}</Documentation>
+                {%- if content.get('fields') %}
                 <Message>
-                    <Scalar type="uint32_t" name="src"><Documentation>Source node id</Documentation></Scalar>
-                    <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number to quote when sending ack</Documentation></Scalar>
-                    <Scalar type="uint32_t" name="iteration"><Documentation>Number of iteration the request belongs to</Documentation></Scalar>
-                    <Scalar type="uint32_t" name="hoplimit"><Documentation>How many further steps to propagate request</Documentation></Scalar>
+                    {%- for fd_id, fd_content in content['fields'].items() %}
+                    {%- set fd_type = fd_content.get('type', 'uint32_t') %}
+                    <Scalar type="{{ fd_type }}" name="{{ fd_id }}">
+                        {%- if 'doc' in fd_content %}
+                        <Documentation>
+                            {{ fd_content['doc'] }}
+                        </Documentation>
+                        {%- endif %}
+                    </Scalar>
+                    {%- endfor %}
                 </Message>
-                <Documentation>Request to traverse surrounding nodes</Documentation>
+                {%- endif %}
             </MessageType>
-
-            <MessageType id="ack">
-                <Message>
-                    <Scalar type="uint32_t" name="src"><Documentation>Source node id</Documentation></Scalar>
-                    <Scalar type="uint32_t" name="dst"><Documentation>Destination node id</Documentation></Scalar>
-                    <Scalar type="uint32_t" name="callback"><Documentation>Callback ticket number</Documentation></Scalar>
-                    <Scalar type="uint32_t" name="discovered"><Documentation>How many new nodes have been discovered</Documentation></Scalar>
-                </Message>
-                <Documentation>Acknowledge completion of a traversal request</Documentation>
-            </MessageType>
-
+            {% endfor %}
         </MessageTypes>
 
         <DeviceTypes>
-            <DeviceType id="node">
-
+            <!-- Generated Block -->
+            <DeviceType id="{{ device.get('name', 'node') }}">
+                {%- if 'properties' in device %}
                 <Properties>
-                    <Scalar name="id" type="uint32_t"/>
-                    <Scalar name="outdegree" type="uint32_t"/>
+                    {%- for p_id, p_content in device['properties'].items() %}
+                    {%- set p_type = p_content.get('type', 'uint32_t') -%}
+                    {%- set is_array = 'length' in p_content -%}
+                    {%- if is_array %}
+                        <Array name="{{ p_id }}" type="{{ p_type }}" length="{{ p_content['length'] }}"></Array>
+                    {%- else %}
+                        <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
+                    {%- endif %}
+                    {%- endfor %}
                 </Properties>
-
+                {%- endif %}
                 <State>
-                    <Scalar name="req_counter" type="uint32_t"/>
-                    <Array name="hoplimits" type="uint32_t" length="100"/>
-
-                    <!--
-
-                    Requests Table [requests_tbl] is a table of request
-                    entries. Each entry consists of the fields:
-
-                    - discovered_sum: sum of nodes discovered via this request (running sum).
-                    - replies_received: number of ack messages received
-                    - requester: id of requesting node
-                    - callback: callback number to quote when sending ack to 'requester'
-
-                    New entries are inserted on the first available slot in
-                    the table (O(n) insertion, but will do for now). An
-                    additional field 'occupied' indicates whether the slot is
-                    used.
-
-                     -->
-
-                    <Array name="requests_tbl_occupied" type="uint32_t" length="1000"/>
-                    <Array name="requests_tbl_discovered_sum" type="uint32_t" length="1000"/>
-                    <Array name="requests_tbl_replies_received" type="uint32_t" length="1000"/>
-                    <Array name="requests_tbl_requester" type="uint32_t" length="1000"/>
-                    <Array name="requests_tbl_callback" type="uint32_t" length="1000"/>
-
-                    <!--
-
-                    Temporary variables to pass req message fields to rew
-                    output handler:
-
-                     -->
-
-                    <Scalar name="msg_req_rts" type="uint32_t"/>
-                    <Scalar name="msg_req_callback" type="int32_t"/>
-                    <Scalar name="msg_req_iteration" type="uint32_t"/>
-                    <Scalar name="msg_req_hoplimit" type="uint32_t"/>
-
-                    <!--
-
-                    Temporary variables to pass req message fields to ack
-                    output handler:
-
-                     -->
-
-                    <Scalar name="msg_ack_rts" type="uint32_t"/>
-                    <Scalar name="msg_ack_dst" type="uint32_t"/>
-                    <Scalar name="msg_ack_callback" type="uint32_t"/>
-                    <Scalar name="msg_ack_discovered" type="uint32_t"/>
-
+                    {%- for s_id, s_content in device['state'].items() %}
+                    {%- set p_type = s_content.get('type', 'uint32_t') -%}
+                    {%- set is_array = 'length' in s_content -%}
+                    {%- if is_array %}
+                        <Array name="{{ s_id }}" type="{{ p_type }}" length="{{ s_content['length'] }}"></Array>
+                    {%- else %}
+                        <Scalar name="{{ s_id }}" type="{{ p_type }}"></Scalar>
+                    {%- endif %}
+                    {%- endfor %}
                 </State>
 
                 <ReadyToSend>
                     <![CDATA[
 
-{{ include('ready_to_send.c') }}
+                        {{ include('ready_to_send.c') }}
 
                     ]]>
                 </ReadyToSend>
@@ -106,57 +78,41 @@
                     <OnReceive>
                         <![CDATA[
 
-{{ include('init.c') }}
+                        {{ include('init.c') }}
 
                         ]]>
                     </OnReceive>
                 </InputPin>
 
-                <InputPin messageTypeId="req" name="req_in">
+                {% for msg in messages.keys() %}
+
+                <InputPin messageTypeId="{{ msg }}" name="{{ msg }}_in">
                     <OnReceive>
                         <![CDATA[
 
-{{ include('receive_req.c') }}
+                        {{ include('receive_%s.c' % msg) }}
 
                         ]]>
                     </OnReceive>
                 </InputPin>
 
-                <InputPin messageTypeId="ack" name="ack_in">
-                    <OnReceive>
-                        <![CDATA[
-
-{{ include('receive_ack.c') }}
-
-                        ]]>
-                    </OnReceive>
-                </InputPin>
-
-                <OutputPin messageTypeId="req" name="req_out">
+                <OutputPin messageTypeId="{{ msg }}" name="{{ msg }}_out">
                     <OnSend>
                         <![CDATA[
 
-{{ include('send_req.c') }}
+                        {{ include('send_%s.c' % msg) }}
 
                         ]]>
                     </OnSend>
                 </OutputPin>
 
-                <OutputPin messageTypeId="ack" name="ack_out">
-                    <OnSend>
-                        <![CDATA[
-
-{{ include('send_ack.c') }}
-
-                        ]]>
-                    </OnSend>
-                </OutputPin>
+                {% endfor %}
 
             </DeviceType>
 
         </DeviceTypes>
     </GraphType>
-    <GraphInstance id="graph1" graphTypeId="network">
+    <GraphInstance id="graph1" graphTypeId="{{ type }}">
       <DeviceInstances>
           {%- for node in graph.nodes %}
           <DevI id="{{ node }}" type="node">
@@ -166,9 +122,10 @@
       </DeviceInstances>
       <EdgeInstances>
         {%- for src, dst in graph.get_edge_list() %}
-          <!-- Connection {{src }} -> {{ dst }}  -->
-          <EdgeI path="{{ dst }}:req_in-{{ src }}:req_out"/>
-          <EdgeI path="{{ src }}:ack_in-{{ dst }}:ack_out"/>
+          <!-- Connection {{ src }} -> {{ dst }}  -->
+          {%- for msg in messages.keys() %}
+          <EdgeI path="{{ dst }}:{{ msg }}_in-{{ src }}:{{ msg }}_out"/>
+          {%- endfor %}
         {%- endfor %}
       </EdgeInstances>
     </GraphInstance>

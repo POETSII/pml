@@ -6,6 +6,15 @@ def load_text(file):
         return fid.read()
 
 
+def get_path(file, parent_file):
+    """
+    Return the absolute path of 'file', assuming a workdir where 'parent_file'
+    is located.
+    """
+    parent_dir = os.path.split(parent_file)[0]
+    return os.path.join(parent_dir, file)
+
+
 def generate_xml(template, graph, content=dict()):
     """Generate xml string from xml template and graph object.
 
@@ -26,7 +35,7 @@ def generate_xml(template, graph, content=dict()):
         """Include file in jinja template."""
 
         # Determine absolute path of included file
-        full_file = os.path.join(template_dir, file)
+        full_file = get_path(file, template) if is_file else file
 
         # Create 'inner_content', a copy of 'content' merged with the named
         # arguments of 'include'.
