@@ -6,7 +6,7 @@
 	"Received all replies.*": "green bold",
 	"Inserted new entry.*": "red bold",
 	"Sending ack message back.*": "bold",
-	"Traversal completed": "blue bold",
+	"(?:Iteration|Traversal|Start).*": "blue bold",
 	"received ack from.*": "green bold",
-	"Start": "blue bold"
+	"I am at distance.*": "cyan bold"
 }

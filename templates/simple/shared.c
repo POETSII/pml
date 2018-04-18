@@ -18,9 +18,3 @@ void send_{{ id }}(node_state_t *deviceState, {{ id }}_message_t *msg) {
 }
 
 {%- endfor %}
-
-// Others
-
-int sum(int a, int b) {
-	return a+b;
-}

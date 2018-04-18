@@ -8,6 +8,7 @@
         <SharedCode><![CDATA[
 
 {{ include('shared.c') }}
+{{ include_app('shared.c') }}
 
         ]]></SharedCode>
 

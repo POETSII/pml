@@ -1,46 +1,12 @@
-// initialize hoplimit
+bool is_center = deviceProperties->id == 0;
 
-for (int i=0; i<100; i++)
-    deviceState->hoplimits[i] = 0;
+const uint32_t UNSET_DISTANCE = 0xFFFFFFFF;
 
-// initialize requests table
+deviceState->distance = is_center ? 0 : UNSET_DISTANCE;
 
-for (int i=0; i<1000; i++)
-    deviceState->requests_tbl_occupied[i] = 0;
-
-if (deviceProperties->id == 0) {
-
-    handler_log(2, "Start");
-
-    handler_log(2, "sum(3+5) = %d", sum(3, 5));
-
-    // Insert a dummy request entry in the requests table to kick-start the
-    // traversal process. The entry is marked as root by setting callback = -1
-    // and it is inserted at index 0 in the table.
-
-    deviceState->requests_tbl_occupied[0] = 1;
-    deviceState->requests_tbl_requester[0] = 0;
-    deviceState->requests_tbl_callback[0] = -1; // special code for root request
-    deviceState->requests_tbl_replies_received[0] = 0;
-    deviceState->requests_tbl_discovered_sum[0]  = 0;
-
-    // Now broadcast a request to neighbours
-
-    uint32_t iteration = 3;
-
-    req_message_t outgoing;
-
-    outgoing.src = deviceProperties->id;
-    outgoing.dst = 0xFFFFFFFF; // broadcast
-    outgoing.iteration = iteration;
-    outgoing.callback = 0; // index of root request object in requests table
-    outgoing.hoplimit = iteration - 1;
-
-    send_req(deviceState, &outgoing);
-
-    // Set hoplimit of this iteration manually
-
-    deviceState->hoplimits[iteration] = iteration;
-
+if (is_center) {
+	deviceState->discovered_counts[0] = 1; // just center node is at distance 0
+    handler_log(2, "Start traversal");
+    start_iteration(deviceState, 1);
 }
 

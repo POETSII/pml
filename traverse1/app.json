@@ -55,10 +55,11 @@
             "requests_tbl_callback": {
                 "length": 1000
             },
-            "msg_req_rts": {},
-            "msg_req_callback": {},
-            "msg_req_iteration": {},
-            "msg_req_hoplimit": {}
+            "distance": {},
+            "discovered_counts": {
+                "length": 10
+            },
+            "iteration": {}
         }
     }
 }
