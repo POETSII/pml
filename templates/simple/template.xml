@@ -109,7 +109,7 @@
                     </OnReceive>
                 </InputPin>
 
-                {% for msg in messages.keys() %}
+                {% for msg, content in messages.items() %}
 
                 <InputPin messageTypeId="{{ msg }}" name="{{ msg }}_in">
                     <OnReceive>
@@ -125,7 +125,7 @@
                     <OnSend>
                         <![CDATA[
 
-{{ include_app('send_%s.c' % msg) }}
+{{ include('send_handler.c', msg=msg, fields=content['fields']) }}
 
                         ]]>
                     </OnSend>
