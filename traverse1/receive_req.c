@@ -62,11 +62,19 @@ if (message->hoplimit > min_hoplimit) {
 
     handler_log(2, "Sending ack message back to %d ...", message->src);
 
-    int discovered = 0; // TODO
+    uint32_t discovered = 0; // TODO
 
-    deviceState->msg_ack_rts = 1;
-    deviceState->msg_ack_dst = message->src;
-    deviceState->msg_ack_callback = message->callback;
-    deviceState->msg_ack_discovered = discovered;
+    ack_message_t outgoing;
+
+    outgoing.dst = message->src;
+    outgoing.callback = message->callback;
+    outgoing.discovered = discovered;
+
+    send_ack(deviceState, &outgoing);
+
+    // deviceState->msg_ack_rts = 1;
+    // deviceState->msg_ack_dst = message->src;
+    // deviceState->msg_ack_callback = message->callback;
+    // deviceState->msg_ack_discovered = discovered;
 
 }

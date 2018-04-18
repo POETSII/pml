@@ -67,11 +67,7 @@
             "msg_req_rts": {},
             "msg_req_callback": {},
             "msg_req_iteration": {},
-            "msg_req_hoplimit": {},
-            "msg_ack_rts": {},
-            "msg_ack_dst": {},
-            "msg_ack_callback": {},
-            "msg_ack_discovered": {}
+            "msg_req_hoplimit": {}
         }
     }
 }

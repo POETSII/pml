@@ -34,10 +34,13 @@ if (replies == required_replies) {
 
 		handler_log(2, "Received all replies, sending ack back to parent %d (callback %d) ...", parent, callback);
 
-		deviceState->msg_ack_rts = 1;
-		deviceState->msg_ack_callback = callback;
-		deviceState->msg_ack_discovered = discovered;
-		deviceState->msg_ack_dst = parent;
+		ack_message_t outgoing;
+
+		outgoing.dst = parent;
+		outgoing.callback = message->callback;
+		outgoing.discovered = discovered;
+
+		send_ack(deviceState, &outgoing);
 
 	}
 

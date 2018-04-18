@@ -47,23 +47,38 @@
                     {%- set p_type = p_content.get('type', 'uint32_t') -%}
                     {%- set is_array = 'length' in p_content -%}
                     {%- if is_array %}
-                        <Array name="{{ p_id }}" type="{{ p_type }}" length="{{ p_content['length'] }}"></Array>
+                    <Array name="{{ p_id }}" type="{{ p_type }}" length="{{ p_content['length'] }}"></Array>
                     {%- else %}
-                        <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
+                    <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
                     {%- endif %}
                     {%- endfor %}
                 </Properties>
                 {%- endif %}
+
                 <State>
-                    {%- for s_id, s_content in device['state'].items() %}
+
+                    <!-- Device state fields: -->
+                    {% for s_id, s_content in device['state'].items() %}
                     {%- set p_type = s_content.get('type', 'uint32_t') -%}
                     {%- set is_array = 'length' in s_content -%}
                     {%- if is_array %}
-                        <Array name="{{ s_id }}" type="{{ p_type }}" length="{{ s_content['length'] }}"></Array>
+                    <Array name="{{ s_id }}" type="{{ p_type }}" length="{{ s_content['length'] }}"></Array>
                     {%- else %}
-                        <Scalar name="{{ s_id }}" type="{{ p_type }}"></Scalar>
+                    <Scalar name="{{ s_id }}" type="{{ p_type }}"></Scalar>
                     {%- endif %}
                     {%- endfor %}
+
+                    {% for id, content in messages.items() %}
+                    {%- if content.get('fields') %}
+                    <!-- Software buffer for (outgoing) {{ id }} messages: -->
+
+                    <Scalar name="{{ id }}_buffer_ptr" type="uint32_t"></Scalar>
+                    {%- for fd_id, fd_content in content['fields'].items() %}
+                    <Array name="{{ id }}_buffer_{{ fd_id }}" type="{{ fd_content.get('type', 'uint32_t') }}" length="1000"></Array>
+                    {%- endfor %}
+                    {%- endif %}
+                    {% endfor %}
+
                 </State>
 
                 <ReadyToSend>
@@ -78,7 +93,7 @@
                     <OnReceive>
                         <![CDATA[
 
-                        {{ include('init.c') }}
+                        {{ include_app('init.c') }}
 
                         ]]>
                     </OnReceive>

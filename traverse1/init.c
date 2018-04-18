@@ -38,3 +38,4 @@ if (deviceProperties->id == 0) {
     deviceState->hoplimits[iteration] = iteration;
 
 }
+
