@@ -5,7 +5,8 @@
 // 	{% endfor %}
 
 bool pending_ack_messages = deviceState->ack_buffer_ptr > 0;
+bool pending_req_messages = deviceState->req_buffer_ptr > 0;
 
 *readyToSend =
-	deviceState->msg_req_rts * RTS_FLAG_req_out +
+	(pending_req_messages ? RTS_FLAG_req_out : 0) +
 	(pending_ack_messages ? RTS_FLAG_ack_out : 0);

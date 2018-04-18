@@ -1,6 +1,8 @@
-// receive_req.c
+handler_log(2, "received req with target %d", message->dst);
 
-deviceState->msg_req_rts = 0;
+if (message->dst != 0xFFFFFFFF) // if not a broadcast
+    if (message->dst != deviceProperties->id) // ... and not directed at this node
+        return; // don't process incoming message
 
 handler_log(2, "received msg from %d, iteration = %d, hoplimit = %d",
     message->src,
@@ -43,10 +45,15 @@ if (message->hoplimit > min_hoplimit) {
 
     // 2. Broadcast request to neighbours
 
-    deviceState->msg_req_rts = 1;
-    deviceState->msg_req_iteration = message->iteration;
-    deviceState->msg_req_callback = req_ind;
-    deviceState->msg_req_hoplimit = message->hoplimit - 1;
+    req_message_t outgoing;
+
+    outgoing.src = deviceProperties->id;
+    outgoing.dst = 0xFFFFFFFF; // broadcast
+    outgoing.iteration = message->iteration;
+    outgoing.callback = req_ind;
+    outgoing.hoplimit = message->hoplimit - 1;
+
+    send_req(deviceState, &outgoing);
 
     // Finally, update hoplimits table
 
@@ -66,6 +73,7 @@ if (message->hoplimit > min_hoplimit) {
 
     ack_message_t outgoing;
 
+    outgoing.src = deviceProperties->id;
     outgoing.dst = message->src;
     outgoing.callback = message->callback;
     outgoing.discovered = discovered;

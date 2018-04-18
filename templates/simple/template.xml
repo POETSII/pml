@@ -7,7 +7,7 @@
 
         <SharedCode><![CDATA[
 
-        {{ include('shared.c') }}
+{{ include('shared.c') }}
 
         ]]></SharedCode>
 
@@ -94,7 +94,7 @@
                 <ReadyToSend>
                     <![CDATA[
 
-                        {{ include('ready_to_send.c') }}
+{{ include('ready_to_send.c') }}
 
                     ]]>
                 </ReadyToSend>
@@ -103,7 +103,7 @@
                     <OnReceive>
                         <![CDATA[
 
-                        {{ include_app('init.c') }}
+{{ include_app('init.c') }}
 
                         ]]>
                     </OnReceive>
@@ -115,7 +115,7 @@
                     <OnReceive>
                         <![CDATA[
 
-                        {{ include_app('receive_%s.c' % msg) }}
+{{ include_app('receive_%s.c' % msg) }}
 
                         ]]>
                     </OnReceive>
@@ -125,7 +125,7 @@
                     <OnSend>
                         <![CDATA[
 
-                        {{ include_app('send_%s.c' % msg) }}
+{{ include_app('send_%s.c' % msg) }}
 
                         ]]>
                     </OnSend>

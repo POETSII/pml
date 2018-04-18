@@ -28,10 +28,15 @@ if (deviceProperties->id == 0) {
 
     uint32_t iteration = 3;
 
-    deviceState->msg_req_rts = 1;
-    deviceState->msg_req_callback = 0; // index of root request object in requests table
-    deviceState->msg_req_iteration = iteration;
-    deviceState->msg_req_hoplimit = iteration - 1;
+    req_message_t outgoing;
+
+    outgoing.src = deviceProperties->id;
+    outgoing.dst = 0xFFFFFFFF; // broadcast
+    outgoing.iteration = iteration;
+    outgoing.callback = 0; // index of root request object in requests table
+    outgoing.hoplimit = iteration - 1;
+
+    send_req(deviceState, &outgoing);
 
     // Set hoplimit of this iteration manually
 

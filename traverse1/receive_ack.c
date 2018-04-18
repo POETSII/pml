@@ -1,5 +1,6 @@
-if (message->dst != deviceProperties->id)
-	return; // node is not the intended recipient of this message
+if (message->dst != 0xFFFFFFFF) // if not a broadcast
+	if (message->dst != deviceProperties->id) // ... and not directed at this node
+		return; // don't process incoming message
 
 uint32_t ind = message->callback;
 
@@ -36,6 +37,7 @@ if (replies == required_replies) {
 
 		ack_message_t outgoing;
 
+		outgoing.src = deviceProperties->id;
 		outgoing.dst = parent;
 		outgoing.callback = message->callback;
 		outgoing.discovered = discovered;

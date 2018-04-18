@@ -5,7 +5,7 @@ if (deviceState->ack_buffer_ptr == 0) {
 	// handler_exit("Error, attempted to send while buffer is empty");
 }
 
-uint32_t ind = (deviceState->ack_buffer_ptr)--;
+uint32_t ind = --(deviceState->ack_buffer_ptr);
 
 message->src = deviceProperties->id;
 message->dst = deviceState->ack_buffer_dst[ind];
