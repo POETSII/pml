@@ -32,7 +32,7 @@ if (replies == required_replies) {
 
 		deviceState->discovered_counts[deviceState->iteration] = discovered;
 
-		handler_log(2, "Iteration %d completed (total discovered = %d)", deviceState->iteration, discovered);
+		handler_log(1, "Iteration %d completed (total discovered = %d)", deviceState->iteration, discovered);
 
 		bool cont = discovered > 0; // continue if non-zero nodes have been discovered
 
@@ -44,7 +44,7 @@ if (replies == required_replies) {
 
 		} else {
 
-			handler_log(2, "Traversal completed");
+			handler_log(1, "Traversal completed");
 
 			uint32_t final_iteration = deviceState->iteration;
 
@@ -52,11 +52,11 @@ if (replies == required_replies) {
 
 			for (uint32_t i=0; i < final_iteration; i++) {
 				uint32_t discovered_i = deviceState->discovered_counts[i];
-				handler_log(2, "Discovered at iteration %d = %d nodes", i, discovered_i);
+				handler_log(1, "Discovered at iteration %d = %d nodes", i, discovered_i);
 				total_nodes += discovered_i;
 			}
 
-			handler_log(2, "Total discovered = %d nodes", total_nodes);
+			handler_log(1, "Total discovered = %d nodes", total_nodes);
 			handler_exit(0);
 
 		}
