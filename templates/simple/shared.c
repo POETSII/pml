@@ -19,7 +19,6 @@ void send_{{ id }}(node_state_t *deviceState, {{ msg_struct }} *msg) {
 
 	uint32_t ind = (deviceState->{{ id }}_buffer_ptr)++;
 
-	deviceState->{{ id }}_buffer_src[ind] = msg->src;
 	deviceState->{{ id }}_buffer_dst[ind] = msg->dst;
 
 	{%- for f_id, f_content in field_items %}

@@ -83,7 +83,6 @@
                     {% for id, content in messages.items() %}
                     <!-- Software buffer for (outgoing) {{ id }} messages: -->
 
-                    <Array name="{{ id }}_buffer_src" type="uint32_t" length="1000"></Array>
                     <Array name="{{ id }}_buffer_dst" type="uint32_t" length="1000"></Array>
                     <Scalar name="{{ id }}_buffer_ptr" type="uint32_t"></Scalar>
                     {%- set field_items = content.get('fields', {}).items() %}
