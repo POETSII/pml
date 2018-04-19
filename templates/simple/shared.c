@@ -11,7 +11,7 @@ void send_{{ id }}(node_state_t *deviceState, {{ id }}_message_t *msg) {
 	deviceState->{{ id }}_buffer_src[ind] = msg->src;
 	deviceState->{{ id }}_buffer_dst[ind] = msg->dst;
 
-	{% for f_id, f_content in content['fields'].items() -%}
+	{% for f_id, f_content in content.get('fields', {}).items() -%}
 	deviceState->{{ id }}_buffer_{{ f_id }}[ind] = msg->{{ f_id }};
 	{% endfor %}
 

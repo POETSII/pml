@@ -8,7 +8,7 @@
         <SharedCode><![CDATA[
 
 {{ include('shared.c') }}
-{{ include_app('shared.c') }}
+{{ include_app('shared.c', optional=True) }}
 
         ]]></SharedCode>
 
@@ -21,7 +21,6 @@
             {% for id, content in messages.items() %}
             <MessageType id="{{ id }}">
                 <Documentation>{{ content['doc'] }}</Documentation>
-                {%- if content.get('fields') %}
                 <Message>
                     <Scalar type="uint32_t" name="src">
                         <Documentation>
@@ -33,7 +32,8 @@
                             Destination node id
                         </Documentation>
                     </Scalar>
-                    {%- for fd_id, fd_content in content['fields'].items() %}
+                    {%- set field_items = content.get('fields', {}).items() %}
+                    {%- for fd_id, fd_content in field_items %}
                     {%- set fd_type = fd_content.get('type', 'uint32_t') %}
                     <Scalar type="{{ fd_type }}" name="{{ fd_id }}">
                         {%- if 'doc' in fd_content %}
@@ -44,7 +44,6 @@
                     </Scalar>
                     {%- endfor %}
                 </Message>
-                {%- endif %}
             </MessageType>
             {% endfor %}
         </MessageTypes>
@@ -52,9 +51,11 @@
         <DeviceTypes>
             <!-- Generated Block -->
             <DeviceType id="{{ device.get('name', 'node') }}">
-                {%- if 'properties' in device %}
                 <Properties>
-                    {%- for p_id, p_content in device['properties'].items() %}
+                    <Scalar name="id" type="uint32_t"></Scalar>
+                    <Scalar name="outdegree" type="uint32_t"></Scalar>
+                    {%- set property_items = device.get('properties', {}) %}
+                    {%- for p_id, p_content in property_items %}
                     {%- set p_type = p_content.get('type', 'uint32_t') -%}
                     {%- set is_array = 'length' in p_content -%}
                     {%- if is_array %}
@@ -64,7 +65,6 @@
                     {%- endif %}
                     {%- endfor %}
                 </Properties>
-                {%- endif %}
 
                 <State>
 
@@ -85,7 +85,8 @@
                     <Array name="{{ id }}_buffer_src" type="uint32_t" length="1000"></Array>
                     <Array name="{{ id }}_buffer_dst" type="uint32_t" length="1000"></Array>
                     <Scalar name="{{ id }}_buffer_ptr" type="uint32_t"></Scalar>
-                    {%- for fd_id, fd_content in content['fields'].items() %}
+                    {%- set field_items = content.get('fields', {}).items() %}
+                    {%- for fd_id, fd_content in field_items %}
                     <Array name="{{ id }}_buffer_{{ fd_id }}" type="{{ fd_content.get('type', 'uint32_t') }}" length="1000"></Array>
                     {%- endfor %}
                     {% endfor %}
@@ -126,7 +127,7 @@
                     <OnSend>
                         <![CDATA[
 
-{{ include('send_handler.c', msg=msg, fields=content['fields']) }}
+{{ include('send_handler.c', msg=msg, fields=content.get('fields', {} )) }}
 
                         ]]>
                     </OnSend>
