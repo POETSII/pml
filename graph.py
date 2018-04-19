@@ -72,7 +72,8 @@ class Graph():
     def get_edge_list(self):
         """Return a list of graph edges."""
         result = list()
-        for src, destinations in self.edges.iteritems():
+        for src in sorted(self.edges.keys()):
+            destinations = sorted(self.edges[src])
             for dst in destinations:
                 result.append((src, dst))
         return result
