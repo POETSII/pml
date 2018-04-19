@@ -31,10 +31,7 @@
     },
     "device": {
         "name": "node",
-        "properties": {
-            "id": {},
-            "outdegree": {}
-        },
+        "properties": {},
         "state": {
             "req_counter": {},
             "hoplimits": {
