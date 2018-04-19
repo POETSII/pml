@@ -1,0 +1,18 @@
+{
+    "type": "ro",
+    "template": "simple",
+    "doc": "Ring Oscillator",
+    "messages": {
+        "toggle": {
+            "doc": "Toggle next node"
+        }
+    },
+    "device": {
+        "name": "node",
+        "state": {
+            "counter": {},
+            "state": {},
+            "dummy": {}
+        }
+    }
+}

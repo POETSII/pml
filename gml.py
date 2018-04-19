@@ -42,7 +42,7 @@ def main():
         length = int(args["<length>"])
         graph = generate_ring(length)
 
-    print generate_xml("templates/ro.graphml", graph)
+    print generate_xml("templates/files/ro.graphml", graph)
 
 
 if __name__ == "__main__":
