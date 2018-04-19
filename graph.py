@@ -37,10 +37,10 @@ class Graph():
 
         is_directed = edge_default == "directed"
 
-        self.nodes = {
+        self.nodes = [
             node.attrib["id"]
             for node in root.findall("graphml:node", namespaces)
-        }
+        ]
 
         edge_list = [(e.attrib["source"], e.attrib["target"])
                      for e in root.findall("graphml:edge", namespaces)]
