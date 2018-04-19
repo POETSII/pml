@@ -29,7 +29,7 @@ if (message->hoplimit > min_hoplimit) {
 
     // 2. Broadcast request to neighbours
 
-    req_message_t outgoing;
+    req_msg outgoing;
 
     outgoing.dst = 0xFFFFFFFF; // broadcast
     outgoing.iteration = message->iteration;
@@ -59,7 +59,7 @@ if (message->hoplimit > min_hoplimit) {
         handler_log(2, "I am at distance %d from center", deviceState->distance);
     }
 
-    ack_message_t outgoing;
+    ack_msg outgoing;
 
     outgoing.dst = message->src;
     outgoing.callback = message->callback;

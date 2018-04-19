@@ -8,7 +8,7 @@ if (is_root){
 	deviceState->counter = 1;
 
 	// send message to next node:
-	toggle_message_t outgoing;
+	toggle_msg outgoing;
 	outgoing.dst = 0xFFFFFFFF; // broadcast
 	send_toggle(deviceState, &outgoing);
 

@@ -39,7 +39,7 @@ bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
 
 	// Now broadcast a request to neighbours
 
-	req_message_t outgoing;
+	req_msg outgoing;
 
 	outgoing.dst = 0xFFFFFFFF; // broadcast
 	outgoing.iteration = iteration;

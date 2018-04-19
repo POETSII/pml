@@ -66,7 +66,7 @@ if (replies == required_replies) {
 		handler_log(2, "Received all replies, sending ack back to parent %d (callback %d, discovered = %d) ...",
 			parent, callback, discovered);
 
-		ack_message_t outgoing;
+		ack_msg outgoing;
 
 		outgoing.dst = parent;
 		outgoing.callback = callback;
