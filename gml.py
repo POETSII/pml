@@ -9,8 +9,11 @@ from itertools import product
 usage = """gml.py
 
 Usage:
-  gml.py random <nodes> <edges>
-  gml.py ring <length>
+  gml.py [options] random <nodes> <edges>
+  gml.py [options] ring <length>
+
+Options:
+  -d, --directed  Produce directed graph.
 
 """
 
@@ -42,7 +45,9 @@ def main():
         length = int(args["<length>"])
         graph = generate_ring(length)
 
-    print generate_xml("templates/files/ro.graphml", graph)
+    content = {"directed": args["--directed"]}
+
+    print generate_xml("templates/files/base.graphml", graph, content=content)
 
 
 if __name__ == "__main__":
