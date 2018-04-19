@@ -1,6 +1,6 @@
 int create_request(node_state_t *deviceState, uint32_t requester, uint32_t callback) {
 
-	// 1a. Determine next available slot in requests table
+	// Determine next available slot in requests table
 
 	int req_ind = 0;
 
@@ -8,13 +8,15 @@ int create_request(node_state_t *deviceState, uint32_t requester, uint32_t callb
 
 	if (req_ind == 1000) return -1; // fail if table is full
 
+	// insert request into available slot (req_ind)
+
 	deviceState->requests_tbl_occupied[req_ind]         = 1;
 	deviceState->requests_tbl_requester[req_ind]        = requester;
 	deviceState->requests_tbl_callback[req_ind]         = callback;
 	deviceState->requests_tbl_replies_received[req_ind] = 0;
 	deviceState->requests_tbl_discovered_sum[req_ind]   = 0;
 
-	return req_ind; // a non-negative result indicates success
+	return req_ind; // return request index (non-negative return value indicates success)
 }
 
 bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
