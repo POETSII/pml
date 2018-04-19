@@ -8,6 +8,7 @@
         <SharedCode><![CDATA[
 
 {{ include('shared.c') }}
+
 {{ include_app('shared.c', optional=True) }}
 
         ]]></SharedCode>
@@ -54,7 +55,7 @@
                 <Properties>
                     <Scalar name="id" type="uint32_t"></Scalar>
                     <Scalar name="outdegree" type="uint32_t"></Scalar>
-                    {%- set property_items = device.get('properties', {}) %}
+                    {%- set property_items = device.get('properties', {}).items() %}
                     {%- for p_id, p_content in property_items %}
                     {%- set p_type = p_content.get('type', 'uint32_t') -%}
                     {%- set is_array = 'length' in p_content -%}
