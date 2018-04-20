@@ -12,6 +12,7 @@ usage = """gml.py
 
 Usage:
   gml.py [options] full <nodes>
+  gml.py [options] tree <depth> <bfactor>
   gml.py [options] random <nodes> <edges>
   gml.py [options] line [--fold] <length>
   gml.py [options] grid [--fold] <length> <width>
@@ -26,8 +27,35 @@ Options:
 """
 
 
+def generate_tree(depth, bfactor):
+    """Create a tree graph.
+
+    Args:
+        depth (int): tree depth.
+        bfactor (int): branching factor.
+
+    Returns:
+        Graph: graph object.
+    """
+
+    edges = defaultdict(list)
+    nodes, frontier = ["n"], ["n"]
+
+    for _ in range(depth-1):
+        new_frontier = []
+        for node in frontier:
+            children = ["%s-%d" % (node, ind) for ind in range(bfactor)]
+            nodes += children
+            edges[node] += children
+            new_frontier += children
+        frontier = new_frontier
+
+    graph = Graph(nodes, edges)
+    return graph
+
+
 def generate_full(n):
-    """Create a fully connected graph.
+    """Create a fully-connected graph.
 
     Args:
         n (int): number of nodes.
@@ -97,7 +125,7 @@ def generate_hypercube(sides, fold=False):
         return reduce(mul, sides[:d], 1)
 
     def ind2sub(ind):
-        """Convert a hypercube node index to a list of sub-coordinates.
+        """Convert a hypercube node index to a coordinate list.
 
         Args:
             ind (int): index.
@@ -119,7 +147,7 @@ def generate_hypercube(sides, fold=False):
         return subs
 
     def sub2ind(subs):
-        """Convert a list of hypercube sub-coordinates to an index.
+        """Convert a list of hypercube coordinates to an index.
 
         Args:
             subs ([int]): coordinates.
@@ -180,6 +208,11 @@ def main():
         nodes = int(args["<nodes>"])
         edges = int(args["<edges>"])
         graph = generate_random(nodes, edges)
+
+    elif args["tree"]:
+        depth = int(args["<depth>"])
+        bfactor = int(args["<bfactor>"])
+        graph = generate_tree(depth, bfactor)
 
     if args["full"]:
         nodes = int(args["<nodes>"])
