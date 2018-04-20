@@ -17,7 +17,7 @@ a graph in GraphML format.
 
 The application configuration file is a concise description of the
 application, specifying things such as message/state fields and documentation
-strings. An example of this file is shown below:
+strings. An example is shown below:
 
 
 ```json
@@ -40,156 +40,96 @@ strings. An example of this file is shown below:
 }
 ```
 
-This format is similar to the POETS XML schema but with few notable
-exceptions:
+This format is similar to the POETS XML schema but has three important
+differences:
 
-- It does not contain device instance or connectivity information (the problem
-graph). Graph instances are not considered part of `pml` application logic --
-they are treated as a seperate input to the code generation process. This
-decoupling allows the same application to be combined with graphs of different
-sizes and topologies.
+- **It does not contain device instance or connectivity information (the
+problem graph)**. Graph instances are not considered part of `pml` application
+logic -- they are treated as a seperate input to the code generation process.
+This decoupling allows the same application to be combined with graphs of
+different sizes and topologies.
 
-- It does not contain handler code snippers; these are stored in separate `.c`
-files so that they are more convenient to edit. They are included
+- **It does not contain handler code snippets**. These are stored in separate
+`.c` files, so that they are more convenient to edit, and are included
 automatically during code generation.
 
 - In general, the format follows [convention over
 configuration](https://en.m.wikipedia.org/wiki/Convention_over_configuration).
 For example, undeclared types are assumed `uint32_t` and handler code files
-have must be named `receive_MSGTYPE.c`.
+must be placed in the same directory as the configuration file.
+
+### Tool Advantages
+
+#### Choice of Programming Model
 
 In the above application file, the `"template": "simple"` entry defines this
 application as an instance of the `simple` template. `pml` supports different
 code generation templates that provide slightly different programming models.
 For example, `simple` applications contain a single device type that can send
-and receive all message types.
+and receive all message types. The `simple` template makes it easier to
+develop these applications without having to worry about device types, pins or
+edges, all irrelevant details in this case.
+
+`pml` does not only abstract away capabilities. Some templates emulate
+behavior that is not directly supported by hardware (or the POETS XML schema)
+but is useful or convenient in some applications. For example, `simple` allows
+receive handlers to queue messages for delivery (using software buffers).
+
+#### Templating and Introspection
+
+`pml` templates are in fact [Jinja2](http://jinja.pocoo.org/) template XML
+files, inheriting all the capabilities of Jinja. Application handler files are
+imported as Jinja templates too, and are passed graph and application
+information through Jinja's
+[context](http://jinja.pocoo.org/docs/2.10/api/#the-context) giving them
+poweful templating and introspective features.
+
+To illustrate why this may be useful, consider the following snippet:
+
+```c
+// File: print_msg.c
+
+handler_log(2, "Content of %d message:", {{ msg_type }})
+
+{%- set fields = messages[msg_type].get('fields', {}).keys() %}
+{%- for field in fields %}
+handler_log(2, "Field {{ field }} = %d", msg->{{ field }});
+{% endfor %}
+```
+
+The above template can be re-used to dump the content of any message type, for
+example as in:
+
+```c
+// File: receive_req.c
+
+{{ include('print_msg.c', msg_type='req') }}
+```
+
+This is possible because the context of `print_msg.c` has access to the
+application's configuration (the `messages` dictionary in this case) so it can
+enumerate message fields during code generation. Graph information can be
+accessed in a similar way too, offering a convenient alternative to
+maintaining XML properties.
 
 ### Requirements
 
-PML requires Python 2 and `pip`.
+`pml` requires Python 2 and `pip`.
 
 ### Installation
 
-Using `virtualenv`:
+Using `pip`:
 
 ```bash
-git clone https://github.com/tuura/pml.git
+git clone https://github.com/POETSII/pml.git
+pip install -r requirements.txt
+```
+
+or with `pip` and `virtualenv`:
+
+```bash
+git clone https://github.com/POETSII/pml.git
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
 ```
-
-### Generating POETS XML
-
-To generate a POETS XML file, you'll need
-
-1. a `jinja2` template xml file (the tool ships with a ready-made drug
-discovery template `templates/fantasi.xml`)
-
-2. an input problem graph
-
-#### Example
-
-```bash
-# Download a test problem graph from POETS website
-
-wget -q https://poets-project.org/download/n3.graphml
-
-# Run the tool
-
-./pml.py gen templates/fantasi.xml n3.graphml > poets.xml
-```
-
-This will generate a POETS application for calculating average shortest path
-in the supplied `n3.graphml` problem instance.
-
-### Reference Algorithms
-
-#### Average Path Length (APL)
-
-The tool can calculate the APL of an input graph as follows:
-
-```
-./pml.py apl n3.graphml
-```
-
-Refer to the following paper for a definition of APL:
-
-[1] Andrey Mokhov, Alessandro de Gennaro, Ghaith Tarawneh, Jonny Wray, Georgy Lukyanov, Sergey Mileiko, Joe Scott, Alex Yakovlev, Andrew Brown. _Language and Hardware Acceleration Backend for Graph Processing_. Forum on specification & Design Languages (FDL 2017). In Press.
-[[paper](https://github.com/tuura/papers/blob/master/fdl-2017/graphs-on-fpga.pdf),
-[slides](https://github.com/tuura/papers/blob/master/fdl-2017/graphs-on-fpga-slides.pdf)]
-
-Certain nodes can be excluded from the graph using `apl disable <node_list>` where `<node_list>` is a *double-quoted* list of node names, as they are defined in the input GraphML file, for example:
-
-```
-./pml.py apl disable "000001 000002 000003" n3.graphml
-```
-
-Note that node names are *strings* and so attempting to run the above with say `./pml.py apl disable "1 2 3" n3.graphml` will result in an error.
-
-In case the disabled nodes form the majority of all nodes, it may be easier to
-specify which nodes are _enabled_ instead:
-
-```
-./pml.py apl enable "000001 000002 000003" n3.graphml
-```
-
-#### Impact Analysis
-
-Impact is a measure of the network perturbance caused by node removal, as a
-function of removed node count. Again, refer to [1] for a concrete definition
-of _impact_. PML can calculate impact as follows:
-
-```
-./pml.py impact 20 10 n3.graphml
-
-[
-    2.4294239750908146,
-    2.4255504485136035,
-    2.443787530580473,
-    2.442008303061754,
-    2.410037808584773,
-    2.4274779449922157,
-    2.3967492030543407,
-    2.466380013344206,
-    2.439228260063756,
-    2.4178219289791683
-]
-```
-
-Here running 10 trials in which 20 random nodes where removed from the graph,
-and calculating impact in each case. The output produced by the tool is a JSON list.
-
-Impact analysis can be parallelized using the `--workers` switch.
-
-### Benchmark Problems
-
-These are sample graphs of increasing complexity (n5 is the largest, with 3487
-nodes) that PML can convert into POETS XML:
-
-* https://poets-project.org/download/n1.graphml
-* https://poets-project.org/download/n2.graphml
-* https://poets-project.org/download/n3.graphml
-* https://poets-project.org/download/n4.graphml
-* https://poets-project.org/download/n5.graphml
-
-The following archive contains 10 more graphs ranging from 1k to 10k nodes
-which can be used for stress testing:
-
-* https://poets-project.org/download/big_network_problems.tar.gz
-
-### Sample Generated POETS Markup
-
-These files are generated using the `fantasi.xml` template and the graphs n1
-through n5 above:
-
-* https://poets-project.org/download/fantasi-n1.xml
-* https://poets-project.org/download/fantasi-n2.xml
-* https://poets-project.org/download/fantasi-n3.xml
-* https://poets-project.org/download/fantasi-n4.xml
-* https://poets-project.org/download/fantasi-n5.xml
-
-### Other Tools
-
-The repo contains a simple support tool `gml.py` that can be used to generate
-random graphs in GraphML format (usage is `gml.py <nodes> <edges>`).
