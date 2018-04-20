@@ -8,34 +8,34 @@ class Graph():
         # 1. Graph(graphml_file)
         # 2. Graph(nodes, edges)
 
-        handlers = {1: self.__init_graphml__, 2: self.__init_nodes_edges__}
+        signature = tuple(map(type, args))
 
-        def raise_invalid(*_):
-            raise Exception("Invalid constructor arguments")
+        handlers = {
+            (str): self._init_graphml,
+            (list, list): self._init_nodes_edges,
+            (list, dict): self._init_nodes_edges,
+            (list, defaultdict): self._init_nodes_edges
+        }
 
-        handler = handlers.get(len(args), raise_invalid)
-        handler(*args)
+        assert signature in handlers, 'Unsupported arguments %s' % str(signature)
+        handlers[signature](*args)
 
-    def __init_graphml__(self, graphml_file):
-        self.load_graphml(graphml_file)
+    def _init_graphml(self, graphml_file):
+        self._load_graphml(graphml_file)
 
-    def __init_nodes_edges__(self, nodes, edges):
+    def _init_nodes_edges(self, nodes, edges):
         self.nodes = nodes
+        if type(edges) is dict: self.edges = edges
+        if type(edges) is defaultdict: self.edges = edges
+        else: self.set_edge_list(edges)
 
-        if type(edges) is dict:
-            self.edges = edges
-        else:
-            self.set_edge_list(edges)
-
-    def load_graphml(self, file):
+    def _load_graphml(self, file):
 
         root = ET.parse(file).getroot()[0]
 
         namespaces = {"graphml": "http://graphml.graphdrawing.org/xmlns"}
 
         edge_default = root.attrib.get("edgedefault", "directed")
-
-        is_directed = edge_default == "directed"
 
         self.nodes = [
             node.attrib["id"]
@@ -45,7 +45,7 @@ class Graph():
         edge_list = [(e.attrib["source"], e.attrib["target"])
                      for e in root.findall("graphml:edge", namespaces)]
 
-        if is_directed:
+        if edge_default == "directed":
             complete_list = edge_list
         else:
             flipped_list = [(dst, src) for src, dst in edge_list]
@@ -82,18 +82,24 @@ class Graph():
         """Return outdegree of a node."""
         return len(self.edges[node])
 
+    def map_node_names(self, name_map):
+
+        def rename_edge(edge):
+            src, dst = edge
+            return (name_map[src], name_map[dst])
+
+        new_edge_list = map(rename_edge, self.get_edge_list())
+
+        self.nodes = sorted(name_map.values())
+        self.set_edge_list(new_edge_list)
+
+
     def rename_nodes(self, name_format="n%d"):
 
-        node_d = {
+        name_map = {
             node: name_format % ind
             for ind, node in enumerate(self.nodes)
         }
 
-        def ren_e(edge):
-            src, dst = edge
-            return (node_d[src], node_d[dst])
+        self.map_node_names(name_map)
 
-        new_edge_list = map(ren_e, self.get_edge_list())
-
-        self.nodes = sorted(node_d.values())
-        self.set_edge_list(new_edge_list)

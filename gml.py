@@ -132,16 +132,12 @@ def generate_hypercube(sides, fold=False):
         assert all(in_range), 'incorrect subindex list'
         return sum([subs[i] * get_weight(i) for i in range(dimensions)])
 
-    def get_node_name(index):
-        subs = ind2sub(index)
-        parts = map(str, subs)
-        name = "n" + "-".join(parts)
-        return name
+    # Create graph
 
-    nodes = map(get_node_name, range(n))  # list of node names
     edges = defaultdict(list)
+    nodes = range(n)
 
-    for ind, node in enumerate(nodes):
+    for ind in nodes:
         subs = ind2sub(ind)
         for d in range(dimensions):
             last_along_dimension = subs[d] == sides[d] - 1
@@ -149,13 +145,31 @@ def generate_hypercube(sides, fold=False):
             adjacent_subs = list(subs)
             adjacent_subs[d] = (adjacent_subs[d] + 1) % sides[d]
             adjacent_ind = sub2ind(adjacent_subs)
-            adjacent_name = get_node_name(adjacent_ind)
-            edges[node].append(adjacent_name)
+            edges[ind].append(adjacent_ind)
 
-    # remove duplicates
-    edges = {src: list(set(dsts)) for src, dsts in edges.iteritems()}
     graph = Graph(nodes, edges)
 
+    # Rename nodes
+
+    def get_node_name(ind):
+        """Get coordinate-based node name.
+
+        For example, 'n-1-2-3' where 1, 2 and 3 are node coordinates.
+
+        Args:
+            ind (int): node index.
+
+        Returns:
+            str: node name.
+
+        """
+        subs = ind2sub(ind)
+        parts = map(str, subs)
+        name = "n" + "-".join(parts)
+        return name
+
+    node_map = {ind: get_node_name(ind) for ind in range(n)}
+    graph.map_node_names(node_map)
     return graph
 
 
