@@ -8,7 +8,7 @@ from docopt import docopt
 from generator import generate_xml
 from generator import get_path
 
-usage = """pml.py
+usage = """PML v0.1
 
 Usage:
   pml.py <app.json> <file.graphml>
@@ -17,23 +17,42 @@ Usage:
 
 
 def main():
-
-    args = docopt(usage, version="pml.py ver 1.0")
+    args = docopt(usage, version="PML v0.1")
     xml = build(args["<app.json>"], args["<file.graphml>"])
     print xml
 
 
 def build(app_file, graphml_file):
+    """Generate an XML file from app and graph files.
+
+    Args:
+        app_file (str): Path to application JSON file.
+        graphml_file (str): Path to GraphML file.
+
+    Returns:
+        str: xml file content.
+
+    """
+
     def include_app_file(file, optional=False):
+        """Return content of file in app directory.
+
+        Args:
+            file (str): Path to file.
+            optional (bool): True iff loading file is optional.
+
+        Returns:
+            str: content of file.
+
+        """
         full_file = get_path(file, app_file)
-        if os.path.isfile(full_file):
-            return generate_xml(full_file, graph, content)
-        elif optional:
-            return ''
-        else:
-            raise Exception('Required file %s not found' % file)
+        exists = os.path.isfile(full_file)
+        if exists: return generate_xml(full_file, graph, content)
+        elif optional: return ''
+        else: raise Exception('Required file %s not found' % file)
 
     def read_json(file):
+        """Read a JSON file."""
         with open(file, "r") as fid:
             return json.load(fid)
 

@@ -81,3 +81,19 @@ class Graph():
     def get_outdegree(self, node):
         """Return outdegree of a node."""
         return len(self.edges[node])
+
+    def rename_nodes(self, name_format="n%d"):
+
+        node_d = {
+            node: name_format % ind
+            for ind, node in enumerate(self.nodes)
+        }
+
+        def ren_e(edge):
+            src, dst = edge
+            return (node_d[src], node_d[dst])
+
+        new_edge_list = map(ren_e, self.get_edge_list())
+
+        self.nodes = sorted(node_d.values())
+        self.set_edge_list(new_edge_list)

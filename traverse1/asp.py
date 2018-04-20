@@ -3,7 +3,6 @@
 import os
 import json
 
-from apl import get_apl
 from graph import Graph
 from docopt import docopt
 from random import sample
@@ -14,9 +13,9 @@ from multiprocessing import Pool
 usage = """asp.py
 
 Usage:
-  asp.py [options] <file.graphml>
-  asp.py [options] enable <node_list> <file.graphml>
-  asp.py [options] disable <node_list> <file.graphml>
+  asp.py [options] apl <file.graphml>
+  asp.py [options] apl enable <node_list> <file.graphml>
+  asp.py [options] apl disable <node_list> <file.graphml>
   asp.py [options] impact <node_count> <trials> <file.graphml>
 
 Options:
@@ -144,6 +143,34 @@ def get_impact_list(file, trials=10, m=1, method="random"):
         return get_impact(graph, disabled)
 
     return [get_impact_w() for _ in range(trials)]
+
+
+def get_apl(graph, verbose=False):
+    """Calculate average path length"""
+
+    total_pl_sum = 0
+
+    def log(msg):
+        if verbose:
+            print msg
+
+    for n in graph.nodes:
+        log("Searching from node: %s" % n)
+        visited = {n}
+        to_visit = graph.edges[n]
+        depth, node_plsum = 1, 0
+        while to_visit:
+            node_plsum += depth * len(to_visit)
+            visited |= to_visit
+            new_to_visit = set()
+            for m in to_visit:
+                new_to_visit |= graph.edges[m]
+            to_visit = new_to_visit - visited
+            log("  at depth = %d, discovered: %s" % (depth, list(to_visit)))
+            depth += 1
+        log("  sum of node path distances = %d" % node_plsum)
+        total_pl_sum += node_plsum
+    return total_pl_sum
 
 
 if __name__ == "__main__":

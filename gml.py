@@ -25,62 +25,88 @@ Options:
 
 """
 
-def normalize_node_names(graph):
-    """Return an isomorphic graph instance with node names
-    in the form n1, n2 ..."""
-
-    nodes = graph.nodes
-    edge_list = graph.get_edge_list()
-
-    node_d = {
-        node: "n%d" % ind
-        for ind, node in enumerate(nodes)
-    }
-
-    def ren_e(edge):
-        src, dst = edge
-        return (node_d[src], node_d[dst])
-
-    new_edge_list = map(ren_e, edge_list)
-    new_nodes = sorted(node_d.values())
-
-    result = Graph(new_nodes, new_edge_list)
-    return result
 
 def generate_full(n):
-    """Create a fully connected topology."""
+    """Create a fully connected graph.
+
+    Args:
+        n (int): number of nodes.
+
+    Returns:
+        Graph: graph object.
+
+    """
     get_name = lambda ind: "n%d" % ind
-    get_edges = lambda ind: range(ind+1, n)
+    get_edges = lambda ind: range(ind + 1, n)
     nodes = map(get_name, range(n))
     edges = {get_name(ind): map(get_name, get_edges(ind)) for ind in range(n)}
     return Graph(nodes, edges)
 
 
 def generate_random(nodes, edges):
-    """Create a graph with specified numbers of nodes and edges."""
+    """Create a graph with random edges.
 
+    Args:
+        nodes (int): number of nodes.
+        edges (int): number of edges.
+
+    Returns:
+        Graph: graph object.
+
+    """
     nodes = ["n%d" % i for i in range(nodes)]
     edge_list = sample(list(product(nodes, nodes)), edges)
     return Graph(nodes, edge_list)
 
 
 def generate_hypercube(sides, fold=False):
-    """Return a hypercube topology with given side length and dimensionality.
+    """Create a hypercube graph.
 
-    Dimensions are folded iff fold is True.
+    Args:
+       sides ([int]): list of dimension lengths.
+       fold (bool): fold all dimensions.
+
+    Returns:
+        Graph: graph object.
+
     """
-
     dimensions = len(sides)
-
     n = reduce(mul, sides, 1)  # n = product(sides)
 
     def get_weight(d):
-        """Get weight of dimension."""
+        """Get weight of dimension.
+
+        The weight of a dimension is the product of previous dimensions'
+        lengths. For example, assume we have a hypercube with sides = [60, 60,
+        24] (representing the seconds, minutes and hours of time). In this
+        case, the weight of a second is 1, the weight of a minute is 1x60 = 60
+        and the weight of an hour is 60x60 = 3600. Intuitively, the weight
+        here is how many units of the smallest dimension does a unit of each
+        dimension weigh (for the smallest dimension, it's 1 by definition).
+
+        This function is used for calculating indices from hypercube
+        coordinates.
+
+        Args:
+            d (int): index of dimension.
+
+        Returns:
+            int: weight of dimension `d`.
+
+        """
         return reduce(mul, sides[:d], 1)
 
     def ind2sub(ind):
-        if not (0 <= ind < n):
-            raise Exception("incorrect index %d (only %d nodes)" % (ind, n))
+        """Convert a hypercube node index to a list of sub-coordinates.
+
+        Args:
+            ind (int): index.
+
+        Returns:
+            [int]: coordinates.
+
+        """
+        assert (0 <= ind < n), 'incorrect index %d (only %d nodes)' % (ind, n)
 
         subs = [None for _ in sides]
         remainder = ind
@@ -93,23 +119,18 @@ def generate_hypercube(sides, fold=False):
         return subs
 
     def sub2ind(subs):
+        """Convert a list of hypercube sub-coordinates to an index.
+
+        Args:
+            subs ([int]): coordinates.
+
+        Returns:
+            int: index.
+
+        """
         in_range = [0 <= sub < side for sub, side in zip(subs, sides)]
-
-        if not all(in_range):
-            raise Exception("incorrect subindex list")
-
+        assert all(in_range), 'incorrect subindex list'
         return sum([subs[i] * get_weight(i) for i in range(dimensions)])
-
-
-    def move(index, dimension, distance):
-        subs = ind2sub(index)
-        subs[dimension] += distance
-        return sub2ind(subs)
-
-    def move_till_side(index, dimension, direction):
-        subs = ind2sub(index)
-        subs[dimension] = (sides[dimension] - 1) if (direction == 1) else 0
-        return sub2ind(subs)
 
     def get_node_name(index):
         subs = ind2sub(index)
@@ -117,23 +138,19 @@ def generate_hypercube(sides, fold=False):
         name = "n" + "-".join(parts)
         return name
 
-    nodes = map(get_node_name, range(n))
+    nodes = map(get_node_name, range(n))  # list of node names
     edges = defaultdict(list)
 
-    for i in range(n):
-        node = get_node_name(i)
-        subs = ind2sub(i)
-
-        def add_neighbour(ind):
-            name = get_node_name(ind)
-            edges[node].append(name)
-
+    for ind, node in enumerate(nodes):
+        subs = ind2sub(ind)
         for d in range(dimensions):
-
-            if subs[d] < sides[d] - 1:
-                add_neighbour(move(i, d, 1))  # positive neighbour
-            elif fold:
-                add_neighbour(move_till_side(i, d, -1))
+            last_along_dimension = subs[d] == sides[d] - 1
+            if last_along_dimension and not fold: continue
+            adjacent_subs = list(subs)
+            adjacent_subs[d] = (adjacent_subs[d] + 1) % sides[d]
+            adjacent_ind = sub2ind(adjacent_subs)
+            adjacent_name = get_node_name(adjacent_ind)
+            edges[node].append(adjacent_name)
 
     # remove duplicates
     edges = {src: list(set(dsts)) for src, dsts in edges.iteritems()}
@@ -177,13 +194,10 @@ def main():
         fold = args["--fold"]
         graph = generate_hypercube(sides, fold)
 
-    content = {
-        "directed": args["--directed"],
-        "instance": args["--id"]
-    }
+    content = {"directed": args["--directed"], "instance": args["--id"]}
 
     if not args["--coords"]:
-        graph = normalize_node_names(graph)
+        graph.rename_nodes("n%d")
 
     print generate_xml("templates/files/base.graphml", graph, content=content)
 
