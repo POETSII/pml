@@ -1,26 +1,68 @@
-## POETS Network Analysis Tool (PML)
+## POETS XML Generator (PML)
 
-This is a tool for generating network-analysis POETS applications (POETS XML)
-from input networks in GraphML. It also includes reference implementations for
-the generated POETS code for comparison against POETS hardware.
-
-The general usage pattern is `pml.py [options] <sucbommand> <files..>`.
+This repository contains a tool (`pml`) for generating POETS XML files from
+higher-level descriptions.
 
 ### Usage
 
 ```
 Usage:
-  pml.py [options] apl <file.graphml>
-  pml.py [options] apl enable <node_list> <file.graphml>
-  pml.py [options] apl disable <node_list> <file.graphml>
-  pml.py [options] gen <template.xml> <file.graphml>
-  pml.py [options] impact <node_count> <trials> <file.graphml>
-
-Options:
-  -i, --info         Print graph traversal information.
-  -w, --workers <n>  Use n parallel workers [default: 1].
-  -p, --psuedo       Use psuedo-randomization.
+  pml.py <app.json> <file.graphml>
 ```
+
+where `app.json` is an _application configuration file_ and `file.graphml` is
+a graph in GraphML format.
+
+### Application Definition
+
+The application configuration file is a concise description of the
+application, specifying things such as message/state fields and documentation
+strings. An example of this file is shown below:
+
+
+```json
+{
+    "type": "ro",
+    "template": "simple",
+    "doc": "Ring Oscillator",
+    "messages": {
+        "toggle": {
+            "doc": "Toggle next node"
+        }
+    },
+    "device": {
+        "name": "node",
+        "state": {
+            "counter": {},
+            "state": {}
+        }
+    }
+}
+```
+
+This format is similar to the POETS XML schema but with few notable
+exceptions:
+
+- It does not contain device instance or connectivity information (the problem
+graph). Graph instances are not considered part of `pml` application logic --
+they are treated as a seperate input to the code generation process. This
+decoupling allows the same application to be combined with graphs of different
+sizes and topologies.
+
+- It does not contain handler code snippers; these are stored in separate `.c`
+files so that they are more convenient to edit. They are included
+automatically during code generation.
+
+- In general, the format follows [convention over
+configuration](https://en.m.wikipedia.org/wiki/Convention_over_configuration).
+For example, undeclared types are assumed `uint32_t` and handler code files
+have must be named `receive_MSGTYPE.c`.
+
+In the above application file, the `"template": "simple"` entry defines this
+application as an instance of the `simple` template. `pml` supports different
+code generation templates that provide slightly different programming models.
+For example, `simple` applications contain a single device type that can send
+and receive all message types.
 
 ### Requirements
 
