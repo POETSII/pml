@@ -20,8 +20,30 @@ Usage:
 
 Options:
   -d, --directed  Produce directed graph.
+  -i, --id=<id>   Specify instance name [default: graph].
+  -c, --indices   Name nodes based on indices.
 
 """
+
+def normalize_node_names(graph):
+    """Return isomorphic graph instance with node names
+    in the form n1, n2 ..."""
+
+    nodes = graph.nodes
+    edge_list = graph.get_edge_list()
+
+    node_d = {
+        node: "n%d" % ind
+        for ind, node in enumerate(nodes)
+    }
+
+    ren_e = lambda (src, dst): (node_d[src], node_d[dst])
+
+    new_edge_list = map(ren_e, edge_list)
+    new_nodes = sorted(node_d.values())
+
+    result = Graph(new_nodes, new_edge_list)
+    return result
 
 def generate_full(n):
     """Create a fully connected topology."""
@@ -153,7 +175,13 @@ def main():
         fold = args["--fold"]
         graph = generate_hypercube(sides, fold)
 
-    content = {"directed": args["--directed"]}
+    content = {
+        "directed": args["--directed"],
+        "instance": args["--id"]
+    }
+
+    if args["--indices"]:
+        graph = normalize_node_names(graph)
 
     print generate_xml("templates/files/base.graphml", graph, content=content)
 
