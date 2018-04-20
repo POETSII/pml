@@ -4,7 +4,7 @@ from graph import Graph
 from random import sample
 from docopt import docopt
 from operator import mul
-from exporter import generate_xml
+from generator import generate_xml
 from itertools import product
 from collections import defaultdict
 
@@ -21,12 +21,12 @@ Usage:
 Options:
   -d, --directed  Produce directed graph.
   -i, --id=<id>   Specify instance name [default: graph].
-  -c, --indices   Name nodes based on indices.
+  -c, --coords    Name nodes based on coordinates.
 
 """
 
 def normalize_node_names(graph):
-    """Return isomorphic graph instance with node names
+    """Return an isomorphic graph instance with node names
     in the form n1, n2 ..."""
 
     nodes = graph.nodes
@@ -37,7 +37,9 @@ def normalize_node_names(graph):
         for ind, node in enumerate(nodes)
     }
 
-    ren_e = lambda (src, dst): (node_d[src], node_d[dst])
+    def ren_e(edge):
+        src, dst = edge
+        return (node_d[src], node_d[dst])
 
     new_edge_list = map(ren_e, edge_list)
     new_nodes = sorted(node_d.values())
@@ -180,7 +182,7 @@ def main():
         "instance": args["--id"]
     }
 
-    if args["--indices"]:
+    if not args["--coords"]:
         graph = normalize_node_names(graph)
 
     print generate_xml("templates/files/base.graphml", graph, content=content)

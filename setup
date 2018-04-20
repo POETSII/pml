@@ -1,4 +1,5 @@
 alias pml="python pml.py"
 alias gml="python gml.py"
+alias asp="python asp.py"
 
 source env/bin/activate
