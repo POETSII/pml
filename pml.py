@@ -16,12 +16,6 @@ Usage:
 """
 
 
-def main():
-    args = docopt(usage, version="PML v0.1")
-    xml = build(args["<app.json>"], args["<file.graphml>"])
-    print xml
-
-
 def build(app_file, graphml_file):
     """Generate an XML file from app and graph files.
 
@@ -62,6 +56,12 @@ def build(app_file, graphml_file):
     env_globals = {'include_app': include_app_file}
     xml = generate_xml(template, graph, env_globals, content)
     return xml
+
+
+def main():
+    args = docopt(usage, version="PML v0.1")
+    xml = build(args["<app.json>"], args["<file.graphml>"])
+    print xml
 
 
 if __name__ == "__main__":
