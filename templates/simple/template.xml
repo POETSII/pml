@@ -105,7 +105,7 @@
                     <OnReceive>
                         <![CDATA[
 
-{{ include_app('init.c') }}
+{{ include_app('init.c', optional=True) }}
 
                         ]]>
                     </OnReceive>
