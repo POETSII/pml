@@ -2,9 +2,6 @@
 
 bool finished = deviceState->counter > 10;
 
-touch_state(deviceState);
-handler_log(2, "dummy = %d", deviceState->dummy);
-
 if (finished) {
 
 	handler_exit(0);

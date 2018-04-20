@@ -11,16 +11,10 @@ output["running"]  = False
 env.output_prefix  = False
 env.use_ssh_config = True
 
-def sim(app, graphml):
-    """Run (remote) simulation using app and graphml files."""
-
-    # Prepare flat xml file (tmp_output)
-    temp_output = 'tmp/output.xml'
-    xml = build(app, graphml)
-    write_file(xml, temp_output)
-
-    # Put file on remote machine and simulate
-    put(temp_output, "/tmp/input.xml")
+def sim():
+    """Run application remotely."""
+    local_file = "tmp/output.xml"
+    put(local_file, "/tmp/input.xml")
     run_script("simulate.sh")
 
 
