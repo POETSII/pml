@@ -23,7 +23,7 @@ strings. An example is shown below:
 ```json
 {
     "type": "ro",
-    "template": "simple",
+    "model": "simple",
     "doc": "Ring Oscillator",
     "messages": {
         "toggle": {
@@ -62,24 +62,24 @@ must be placed in the same directory as the configuration file.
 
 #### Choice of Programming Model
 
-In the above application file, the `"template": "simple"` entry defines this
-application as an instance of the `simple` template. `pml` supports different
-code generation templates that provide slightly different programming models.
+In the above application file, the `"model": "simple"` entry defines this
+application as an instance of the `simple` model. `pml` supports different
+code generation models that provide slightly different programming interface.
 For example, `simple` applications contain a single device type that can send
-and receive all message types. The `simple` template makes it easier to
-develop these applications without having to worry about device types, pins or
-edges, all irrelevant details in this case.
+and receive all message types. The `simple` model makes it easier to develop
+these applications without having to worry about device types, pins or edges,
+all irrelevant details in this case.
 
-`pml` does not only abstract away capabilities. Some templates emulate
-behavior that is not directly supported by hardware (or the POETS XML schema)
-but is useful or convenient in some applications. For example, `simple` allows
+`pml` does not only abstract away capabilities. Some models emulate behavior
+that is not directly supported by hardware (or the POETS XML schema) but is
+useful or convenient in some applications. For example, `simple` allows
 receive handlers to queue messages for delivery (using software buffers).
 
 #### Templating and Introspection
 
-`pml` templates are in fact [Jinja2](http://jinja.pocoo.org/) template XML
-files, inheriting all the capabilities of Jinja. Application handler files are
-imported as Jinja templates too, and are passed graph and application
+`pml` model templates are in fact [Jinja2](http://jinja.pocoo.org/) template
+XML files, inheriting all the capabilities of Jinja. Application handler files
+are imported as Jinja templates too, and are passed graph and application
 information through Jinja's
 [context](http://jinja.pocoo.org/docs/2.10/api/#the-context) giving them
 poweful templating and introspective features.

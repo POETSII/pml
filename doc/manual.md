@@ -4,7 +4,7 @@
 
 - [Application Structure](#application-structure)
 - [Configuration File Format](#configuration-file-format)
-- [The `simple` Template](#the-simple-template)
+- [The `simple` Model](#the-simple-model)
 - [Generating Graphs using `gml`](#generating-graphs-using-gml)
 - [Ring Oscillator Example](#ring-oscillator-example)
 
@@ -17,23 +17,23 @@ directory (the _application directory_).
 ### Configuration File Format
 
 `pml` supports different programming models through the use of application
-templates. Interpreting the configuration file is done entirely by the
+models. Interpreting the configuration file is done entirely by the model's
 template -- the tool does not do anything beyond loading the configuration
-file, examining its `template` field, loading the respective template then
+file, examining its `model` field, loading the respective template then
 passing configuration values (and the graph instance) through Jinja's context
 to the template. This is intentional as it means the tool can be extended to
-support a rich variety of programming models by adding template files instead
-of modifying tool source code. Different templates may require
+support a rich variety of programming models by adding model template files
+instead of modifying tool source code. Different models may require
 slightly-different configuration files but the general structure will always
 be similar.
 
-At the moment, a single template `simple` is supported, which requires the
+At the moment, a single model `simple` is supported, which requires the
 following minimum application configuration:
 
 ```json
 {
     "type": "network",
-    "template": "simple",
+    "model": "simple",
     "messages": {
         "req": {}
     },
@@ -46,7 +46,7 @@ following minimum application configuration:
 }
 ```
 
-The top-level fields `type`, `template`, `messages` and `device` are all
+The top-level fields `type`, `model`, `messages` and `device` are all
 required. `type` is the application name (corresponding to graph type in XML),
 `messages` is a dictionary of message types and `device` contains device type
 information (recall that `simple` applications have a single device type).
@@ -106,18 +106,18 @@ field objects. The above is translated to the following XML:
 Two things are worth noting here:
 
 First, there are two undeclared fields (`src` and `dst`) under `<Message>`.
-These are hidden fields inserted by the `simple` template, in this case to
+These are hidden fields inserted by the `simple` model, in this case to
 support tracking message sources and destinations. In general, it is not so
-uncommon for `pml` templates to insert additional content in the output XML
-(e.g. message/state fields or C code) to support more features or
+uncommon for `pml` model templates to insert additional content in the output
+XML (e.g. message/state fields or C code) to support more features or
 capabilities.
 
 Second, while `id` has no `type` field in the configuration, its type has been
 specified as `uint32_t` in the generated XML file. This is because the
-`simple` template assumes undeclared types are `uint32_t` (future templates
-will adopt the same convention). Given that `uint32_t` is the default type
-(and in line with the format's minimalist philosophy) specifying `uint32_t`
-types is discouraged.
+`simple` model assumes undeclared types are `uint32_t` (future models will
+adopt the same convention). Given that `uint32_t` is the default type (and in
+line with the format's minimalist philosophy) specifying `uint32_t` types is
+discouraged.
 
 #### Device
 
@@ -165,10 +165,10 @@ elements that are not present in the JSON description:
 - Two device properties: `id` and `outdegree`
 - Several state elements named `req_buffer_*`
 
-Again, these are used to support some template features. Apart from these, the
+Again, these are used to support some model features. Apart from these, the
 state elements `visited` and `results` have been specified as expected.
 
-### The `simple` Template
+### The `simple` Model
 
 At the moment, `pml` supports a single programming model, called `simple`. The
 rationale and mechanics of this model are described here.
@@ -185,12 +185,12 @@ devices (assuming slightly different content per outgoing message). Expressing
 this algorithm in a single code block is more convenient than splitting it
 into two (receive and send) parts that communicate through device state.
 
-The `simple` template provides a simpler programming model to accommodate
+The `simple` model provides a simpler programming interface to accommodate
 applications where messages do not signify state updates (e.g. network
 traversal, stream processing, combinatorial solvers). It uses state-based
 software buffers to enable message receive handlers to queue outgoing messages
 for delivery, removing the need to communicate with send handlers via state.
-Since send handlers are not longer required, the template does away with them
+Since send handlers are not longer required, the model does away with them
 completely and lets users code the application as a set of receive handlers.
 This model is not necessarily the most suitable for _all_ applications, but is
 particularly convenient for _some_.
@@ -262,11 +262,11 @@ File               | Description
 `init.c`           | State initialization handler
 `receive_toggle.c` | Message receive handler
 
-This example is based on the `simple` template and contains a single device
-type (`node`) and message type (`toggle`). During initialization, the root
-node (id = 0) broadcasts a `toggle` message. Any node that receives a `toggle`
-will increment a local counter then either broadcast another `toggle` (if
-counter <= 10) or terminate the application (if counter = 10).
+This example is based on the `simple` model and contains a single device type
+(`node`) and message type (`toggle`). During initialization, the root node (id
+= 0) broadcasts a `toggle` message. Any node that receives a `toggle` will
+increment a local counter then either broadcast another `toggle` (if counter
+<= 10) or terminate the application (if counter = 10).
 
 The following commands generate an instance of this application
 

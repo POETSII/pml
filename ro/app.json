@@ -1,6 +1,6 @@
 {
     "type": "ro",
-    "template": "simple",
+    "model": "simple",
     "doc": "Ring Oscillator",
     "messages": {
         "toggle": {

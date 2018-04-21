@@ -1,6 +1,6 @@
 {
     "type": "network",
-    "template": "simple",
+    "model": "simple",
     "doc": "Network Traversal Application",
     "messages": {
         "req": {

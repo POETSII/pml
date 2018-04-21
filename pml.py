@@ -52,7 +52,7 @@ def build(app_file, graphml_file):
 
     content = read_json(app_file)
     graph = Graph(graphml_file)
-    template = 'templates/%s/template.xml' % content["template"]
+    template = 'templates/%s/template.xml' % content["model"]
     env_globals = {'include_app': include_app_file}
     xml = generate_xml(template, graph, env_globals, content)
     return xml
