@@ -1,9 +1,19 @@
 ## POETS XML Generator (PML)
 
+### Content
+
+- [Overview](#overview)
+- [Application Definition](#application-definition)
+- [Benefits](#benefits)
+- [Installation](#installation)
+- [Documentation](#documentation)
+
+### Overview
+
 This repository contains a tool (`pml`) for generating POETS XML files from
 higher-level descriptions.
 
-### Usage
+#### Usage
 
 ```
 Usage:
@@ -58,13 +68,13 @@ configuration](https://en.m.wikipedia.org/wiki/Convention_over_configuration).
 For example, undeclared types are assumed `uint32_t` and handler code files
 must be placed in the same directory as the configuration file.
 
-### Tool Advantages
+### Benefits
 
 #### Choice of Programming Model
 
 In the above application file, the `"model": "simple"` entry defines this
 application as an instance of the `simple` model. `pml` supports different
-code generation models that provide slightly different programming interface.
+code generation models that provide slightly different programming interfaces.
 For example, `simple` applications contain a single device type that can send
 and receive all message types. The `simple` model makes it easier to develop
 these applications without having to worry about device types, pins or edges,
@@ -135,4 +145,4 @@ pip install -r requirements.txt
 ### Documentation
 
 - [User's Manual](https://github.com/POETSII/pml/blob/master/doc/manual.md)
-- Developer's Guide (coming soon)
+- [Developer's Guide](https://github.com/POETSII/pml/blob/master/doc/develop.md)
