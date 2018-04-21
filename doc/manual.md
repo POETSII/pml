@@ -1,5 +1,13 @@
 ## User's Manual
 
+### Content
+
+- [Application Structure](#application-structure)
+- [Configuration File Format](#configuration-file-format)
+- [The `simple` Template](#the-simple-template)
+- [Generating Graphs using `gml`](#generating-graphs-using-gml)
+- [Ring Oscillator Example](#ring-oscillator-example)
+
 ### Application Structure
 
 Each `pml` application consists of a single application configuration file
@@ -9,16 +17,15 @@ directory (the _application directory_).
 ### Configuration File Format
 
 `pml` supports different programming models through the use of application
-templates. The interpretation of the configuration file is done entirely by
-the template -- the tool does not do anything with the configuration file
-beyond loading it, examining the `template` field, loading the respective
-template then passing it configuration values (and the graph instance) through
-Jinja's context. This is intentional as it means the tool can be extended to
-support a rich variety of programming models by adding template files (as
-opposed to modifying tool source code). The upshot however is that the
-configuration file format is not fixed and will vary depending on choice of
-template. In general, templates will maintain as much similarity between
-configuration file structures as possible.
+templates. Interpreting the configuration file is done entirely by the
+template -- the tool does not do anything beyond loading the configuration
+file, examining its `template` field, loading the respective template then
+passing configuration values (and the graph instance) through Jinja's context
+to the template. This is intentional as it means the tool can be extended to
+support a rich variety of programming models by adding template files instead
+of modifying tool source code. Different templates may require
+slightly-different configuration files but the general structure will always
+be similar.
 
 At the moment, a single template `simple` is supported, which requires the
 following minimum application configuration:
@@ -161,10 +168,12 @@ elements that are not present in the JSON description:
 Again, these are used to support some template features. Apart from these, the
 state elements `visited` and `results` have been specified as expected.
 
-### Programming Model
+### The `simple` Template
 
 At the moment, `pml` supports a single programming model, called `simple`. The
 rationale and mechanics of this model are described here.
+
+#### Programming Model
 
 In the POETS XML schema, incoming messages trigger receive handlers that
 update the device's state. The latter is then used to trigger and construct
@@ -186,7 +195,7 @@ completely and lets users code the application as a set of receive handlers.
 This model is not necessarily the most suitable for _all_ applications, but is
 particularly convenient for _some_.
 
-### Code Files
+#### Code Files
 
 An accompanying file `receive_MSGTYPE.c` must be present in the application
 directory for each message of the type `MSGTYPE`. The content of these files
@@ -195,7 +204,10 @@ are inserted into the `<DeviceType>` section of the generated XML file.
 If a file `shared.c` is present in the application directory, its contents are
 inserted into the `<SharedCode>` section.
 
-### Sending Messages
+Also, if a file `init.c` is present, its contents are inserted into the
+initialization section of the device.
+
+#### Sending Messages
 
 Outgoing messages can be queued in receive handlers as follows:
 
@@ -213,3 +225,63 @@ send_toggle(deviceState, &outgoing);
 
 In this example, an outgoing message of type `req` is constructed and queued
 for delivery (note that its destination is specified in the `dst` field).
+
+### Generating Graphs using `gml`
+
+Aside from application files, `pml` requires input graphs to create
+application instances. The repository contains a dedicated tool (`gml`) to
+generate graphs of various topologies in GraphML format, ready to be used with
+`pml`.
+
+#### Usage:
+
+```
+Usage:
+  gml.py [options] full <nodes>
+  gml.py [options] tree <depth> <bfactor>
+  gml.py [options] random <nodes> <edges>
+  gml.py [options] line [--fold] <length>
+  gml.py [options] grid [--fold] <length> <width>
+  gml.py [options] cube [--fold] <length> <width> <height>
+  gml.py [options] hypercube [--fold] <side>...
+
+Options:
+  -d, --directed  Produce directed graph.
+  -i, --id=<id>   Specify instance name [default: graph].
+  -c, --coords    Name nodes based on coordinates.
+```
+
+### Ring Oscillator Example
+
+The directory `ro` contains an example ring oscillator `pml` application that
+can be used to demo the tool. The example consists of only three files:
+
+File               | Description
+------------------ | -----------
+`app.json`         | Configuration file
+`init.c`           | State initialization handler
+`receive_toggle.c` | Message receive handler
+
+This example is based on the `simple` template and contains a single device
+type (`node`) and message type (`toggle`). During initialization, the root
+node (id = 0) broadcasts a `toggle` message. Any node that receives a `toggle`
+will increment a local counter then either broadcast another `toggle` (if
+counter <= 10) or terminate the application (if counter = 10).
+
+The following commands generate an instance of this application
+
+```bash
+# File: generate_ro_instance.sh
+
+# Generate graph
+./gml.py line --fold 10 > /tmp/chain.graphml
+
+# Combine app config with graph to generate app instance
+./pml.py ro/app.json /tmp/chain.graphml > /tmp/ro_inst.xml
+```
+
+Here, `gml` is used to create a line graph with 10 nodes. The `--fold` switch
+connects the first and last nodes to create a chain.
+
+When this example is ran, the `toggle` message generated by the root node will
+circle the chain 10 times then the application will terminate.
