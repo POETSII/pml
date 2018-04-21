@@ -112,14 +112,27 @@ enumerate message fields during code generation. Graph information can be
 accessed in a similar way too, offering a convenient alternative to
 maintaining XML properties.
 
+### Installation
+
+Requirements: Python 2 and `pip`.
+
+To install using `pip`, run:
+
+```bash
+git clone https://github.com/POETSII/pml.git
+pip install -r requirements.txt
+```
+
+or with `pip` and `virtualenv`:
+
+```bash
+git clone https://github.com/POETSII/pml.git
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+```
+
 ### Documentation
 
-- User Manual
-    - [Requirements and Installation](https://github.com/POETSII/pml/blob/master/doc/install.md)
-    - Application File Format
-    - Application Templates
-    - Generating graphs using `gml`
-    - Example Applications
-
-- Developer Guide
-    - Repository Organization
+- [User's Manual](https://github.com/POETSII/pml/blob/master/doc/manual.md)
+- Developer's Guide (coming soon)
