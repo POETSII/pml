@@ -190,10 +190,10 @@ applications where messages do not signify state updates (e.g. network
 traversal, stream processing, combinatorial solvers). It uses state-based
 software buffers to enable message receive handlers to queue outgoing messages
 for delivery, removing the need to communicate with send handlers via state.
-Since send handlers are not longer required, the model does away with them
+Since send handlers are no longer needed, the model does away with them
 completely and lets users code the application as a set of receive handlers.
-This model is not necessarily the most suitable for _all_ applications, but is
-particularly convenient for _some_.
+This model is not necessarily the most suitable for _all_ applications, but it
+is particularly convenient for _some_.
 
 #### Code Files
 

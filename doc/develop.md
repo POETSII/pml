@@ -39,9 +39,9 @@ For example, to create the `<MessageTypes>` section, the template can include
 </MessageTypes>
 ```
 
-In the above, `messages` is the dictionary in the application's configuration
-file. Other fields from the configuration are made available in Jinja's
-context in a similar manner.
+In the above, `messages` is the value of the `messages` field in the
+application's configuration file. Other configuration file fields are made
+available in Jinja's context in a similar manner.
 
 Templates are free in how they use configuration fields. For example,
 replacing `messages` above with `msgs` in both the template and configuration
@@ -52,3 +52,12 @@ file structures will reduce the amount of effort required to (1) learn newer
 models (2) understand model differences and (3) migrate applications to
 different models.
 
+Other than configuration fields, `pml` adds the following to Jinja's context:
+
+- a `graph` object to access graph-related information
+- an `include` function to include files from template directory
+- an `include_app` function to include functions from app directory
+
+A good starting point to learn about generating code using `pml`'s context
+objects is to have a look at existing model templates inside the `templates`
+directory, particularly the file `templates/simple/template.xml`.
