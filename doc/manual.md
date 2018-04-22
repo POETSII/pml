@@ -23,9 +23,9 @@ file, examining its `model` field, loading the respective template then
 passing configuration values (and the graph instance) through Jinja's context
 to the template. This is intentional as it means the tool can be extended to
 support a rich variety of programming models by adding model template files
-instead of modifying tool source code. Different models may require
-slightly-different configuration files but the general structure will always
-be similar.
+instead of modifying tool source code. Different models may require slightly
+different configuration files but the general structure will always be
+similar.
 
 At the moment, a single model `simple` is supported, which requires the
 following minimum application configuration:
@@ -137,7 +137,7 @@ The device object must contain `name` and `state` fields. For example,
 
 (adding `length` to a state element turns it into an array)
 
-which is translated into
+which is translated to
 
 ```xml
 <DeviceType id="node">
@@ -253,14 +253,15 @@ Options:
 
 ### Ring Oscillator Example
 
-The directory [`ro`](ro) contains an example ring oscillator `pml` application
-that can be used to demo the tool. The example consists of only three files:
+The directory [`ro`](../ro) contains an example ring oscillator `pml`
+application that can be used to demo the tool. The example consists of only
+three files:
 
-File                                      | Description
------------------------------------------ | -----------
-[`app.json`](ro/app.json)                 | Configuration file
-[`init.c`](ro/init.c)                     | State initialization handler
-[`receive_toggle.c`](ro/receive_toggle.c) | Message receive handler
+File                                         | Description
+-------------------------------------------- | -----------
+[`app.json`](../ro/app.json)                 | Configuration file
+[`init.c`](../ro/init.c)                     | State initialization handler
+[`receive_toggle.c`](../ro/receive_toggle.c) | Message receive handler
 
 This example is based on the `simple` model and contains a single device type
 (`node`) and message type (`toggle`). During initialization, the root node (id

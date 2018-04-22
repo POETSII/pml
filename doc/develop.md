@@ -9,16 +9,16 @@
 
 The main parts of this repository are listed below.
 
-Item                               | Type                 | Description
----------------------------------- | -------------------- | -----------
-[`pml.py`](pml.py)                 | File (Python module) | Top level module (`pml` tool)
-[`gml.py`](gml.py)                 | File (Python module) | Top level module (`gml` tool)
-[`graph.py`](graph.py)             | File (Python module) | Graph class
-[`generator.py`](generator.py)     | File (Python module) | XML generation functions
-[`doc`](doc)                       | Directory            | Documentation
-[`templates`](templates)           | Directory            | Model template files
-[`ro`](ro)                         | Directory            | Ring oscillator application
-[`traverse1`](traverse1)           | Directory            | Asynchronous network traversal application
+Item                                  | Type                 | Description
+------------------------------------- | -------------------- | -----------
+[`pml.py`](../pml.py)                 | File (Python module) | Top level module (`pml` tool)
+[`gml.py`](../gml.py)                 | File (Python module) | Top level module (`gml` tool)
+[`graph.py`](../graph.py)             | File (Python module) | Graph class
+[`generator.py`](../generator.py)     | File (Python module) | XML generation functions
+[`doc`](../doc)                       | Directory            | Documentation
+[`templates`](../templates)           | Directory            | Model template files
+[`ro`](../ro)                         | Directory            | Ring oscillator application
+[`traverse1`](../traverse1)           | Directory            | Asynchronous network traversal application
 
 ### Developing New Models
 
@@ -61,4 +61,4 @@ Other than configuration fields, `pml` adds the following to Jinja's context:
 A good starting point to learn about generating code using `pml`'s context
 objects is to have a look at existing model templates inside the `templates`
 directory, particularly the file
-[`templates/simple/template.xml`](templates/simple/template.xml).
+[`templates/simple/template.xml`](../templates/simple/template.xml).
