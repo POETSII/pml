@@ -13,6 +13,8 @@
 This repository contains a tool (`pml`) for generating POETS XML files from
 higher-level descriptions.
 
+<img src="svg/overview.svg" width="100%">
+
 #### Usage
 
 ```
