@@ -253,14 +253,14 @@ Options:
 
 ### Ring Oscillator Example
 
-The directory `ro` contains an example ring oscillator `pml` application that
-can be used to demo the tool. The example consists of only three files:
+The directory [`ro`](ro) contains an example ring oscillator `pml` application
+that can be used to demo the tool. The example consists of only three files:
 
-File               | Description
------------------- | -----------
-`app.json`         | Configuration file
-`init.c`           | State initialization handler
-`receive_toggle.c` | Message receive handler
+File                                      | Description
+----------------------------------------- | -----------
+[`app.json`](ro/app.json)                 | Configuration file
+[`init.c`](ro/init.c)                     | State initialization handler
+[`receive_toggle.c`](ro/receive_toggle.c) | Message receive handler
 
 This example is based on the `simple` model and contains a single device type
 (`node`) and message type (`toggle`). During initialization, the root node (id

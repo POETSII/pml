@@ -4,7 +4,7 @@
 
 - [Overview](#overview)
 - [Application Definition](#application-definition)
-- [Benefits](#benefits)
+- [Features](#features)
 - [Installation](#installation)
 - [Documentation](#documentation)
 
@@ -27,9 +27,9 @@ a graph in GraphML format.
 
 ### Application Definition
 
-The application configuration file is a concise description of the
-application, specifying things such as message/state fields and documentation
-strings. An example is shown below:
+The application configuration file (called `app.json` by convention) is a
+concise description of the application, specifying things such as
+message/state fields and documentation strings. An example is shown below:
 
 
 ```json
@@ -70,7 +70,7 @@ configuration](https://en.m.wikipedia.org/wiki/Convention_over_configuration).
 For example, undeclared types are assumed `uint32_t` and handler code files
 must be placed in the same directory as the configuration file.
 
-### Benefits
+### Features
 
 #### Choice of Programming Model
 
@@ -146,5 +146,5 @@ pip install -r requirements.txt
 
 ### Documentation
 
-- [User's Manual](https://github.com/POETSII/pml/blob/master/doc/manual.md)
-- [Developer's Guide](https://github.com/POETSII/pml/blob/master/doc/develop.md)
+- [User's Manual](doc/manual.md)
+- [Developer's Guide](doc/develop.md)
