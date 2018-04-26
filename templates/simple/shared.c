@@ -1,7 +1,7 @@
 {% set software_buffer_size = params.get('sbufsize', 1000) -%}
 {% set target = params.get('target', 'simulation') -%}
 {% set is_hardware = target == 'hardware' -%}
-{% set simulation_device_t = "%s_state_t" % type -%}
+{% set simulation_device_t = "%s_state_t" % device['name'] -%}
 {% set hardware_device_t = "%s_%s_state_t" % (type, device['name']) -%}
 {% set STATE_TYPE = hardware_device_t if is_hardware else simulation_device_t-%}
 
