@@ -26,10 +26,13 @@ void send_{{ id }}({{ STATE_TYPE }} *deviceState, {{ msg_struct }} *msg) {
 
 	uint32_t ind = (deviceState->{{ id }}_buffer_ptr)++;
 
-	if (ind >= {{ software_buffer_size }} ) {
-		handler_log(2, "Error, outgoing {{ id }} message buffer is full");
-		handler_exit(1);
-	}
+	// The check below is commented out for the moment because handler_* can't
+	// be used in <SharedCode>.
+	//
+	// if (ind >= {{ software_buffer_size }} ) {
+	// 	handler_log(2, "Error, outgoing {{ id }} message buffer is full");
+	// 	handler_exit(1);
+	// }
 
 	deviceState->{{ id }}_buffer_dst[ind] = msg->dst;
 
