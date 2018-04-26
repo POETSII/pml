@@ -181,8 +181,8 @@ state elements `visited` and `results` have been specified as expected.
 Parameters are used as a mechanism to override model/application constants and
 behavior per generated application instance. They are passed to
 model/application templates as a dictionary with the name `params` (within
-Jinja's context). Each model has its own parameters so consult the individual
-model section for details.
+Jinja's context). Each model has its own parameters so consult individual
+model sections for details.
 
 ### The `simple` Model
 
