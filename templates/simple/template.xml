@@ -1,3 +1,5 @@
+{% set software_buffer_size = params.get('sbufsize', 1000) -%}
+
 <?xml version="1.0"?>
 <Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
     <GraphType id="{{ type }}">
@@ -83,11 +85,11 @@
                     {% for id, content in messages.items() %}
                     <!-- Software buffer for (outgoing) {{ id }} messages: -->
 
-                    <Array name="{{ id }}_buffer_dst" type="uint32_t" length="1000"></Array>
+                    <Array name="{{ id }}_buffer_dst" type="uint32_t" length="{{ software_buffer_size }}"></Array>
                     <Scalar name="{{ id }}_buffer_ptr" type="uint32_t"></Scalar>
                     {%- set field_items = content.get('fields', {}).items() %}
                     {%- for fd_id, fd_content in field_items %}
-                    <Array name="{{ id }}_buffer_{{ fd_id }}" type="{{ fd_content.get('type', 'uint32_t') }}" length="1000"></Array>
+                    <Array name="{{ id }}_buffer_{{ fd_id }}" type="{{ fd_content.get('type', 'uint32_t') }}" length="{{ software_buffer_size }}"></Array>
                     {%- endfor %}
                     {% endfor %}
 

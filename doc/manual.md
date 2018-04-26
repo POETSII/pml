@@ -4,6 +4,7 @@
 
 - [Application Structure](#application-structure)
 - [Configuration File Format](#configuration-file-format)
+- [Parameters](#parameters)
 - [The `simple` Model](#the-simple-model)
 - [Generating Graphs using `gml`](#generating-graphs-using-gml)
 - [Ring Oscillator Example](#ring-oscillator-example)
@@ -168,6 +169,21 @@ elements that are not present in the JSON description:
 Again, these are used to support some model features. Apart from these, the
 state elements `visited` and `results` have been specified as expected.
 
+### Parameters
+
+`pml` accepts an arbitrary number of code generation parameters using the
+`--param` switch. For example:
+
+```
+./pml --param sbufsize:500 --param target:simulation app.json file.graphml
+```
+
+Parameters are used as a mechanism to override model/application constants and
+behavior per generated application instance. They are passed to
+model/application templates as a dictionary with the name `params` (within
+Jinja's context). Each model has its own parameters so consult the individual
+model section for details.
+
 ### The `simple` Model
 
 At the moment, `pml` supports a single programming model, called `simple`. The
@@ -225,6 +241,18 @@ send_toggle(deviceState, &outgoing);
 
 In this example, an outgoing message of type `req` is constructed and queued
 for delivery (note that its destination is specified in the `dst` field).
+
+#### Parameters
+
+`simple` has the following parameters:
+
+| Name       | Type    | Description                                    | Default Value |
+|:-----------|:--------|:-----------------------------------------------|:--------------|
+| `sbufsize` | Integer | Size of outgoing message buffers               | 1000          |
+| `target`   | String  | Generation target (`simulation` or `hardware`) | `simulation`  |
+
+`target` makes slight adjustments to make the generated code compatible with
+either `epochsim` or POETS hardware.
 
 ### Generating Graphs using `gml`
 

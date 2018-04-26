@@ -19,7 +19,10 @@ higher-level descriptions.
 
 ```
 Usage:
-  pml.py <app.json> <file.graphml>
+  pml.py [-p <name:value>...] <app.json> <file.graphml>
+
+Options:
+  -p, --param <name:value>  Specify a code generation parameter.
 ```
 
 where `app.json` is an _application configuration file_ and `file.graphml` is

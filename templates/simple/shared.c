@@ -1,3 +1,10 @@
+{% set software_buffer_size = params.get('sbufsize', 1000) -%}
+{% set target = params.get('target', 'simulation') -%}
+{% set is_hardware = target == 'hardware' -%}
+{% set simulation_device_t = "%s_state_t" % type -%}
+{% set hardware_device_t = "%s_%s_state_t" % (type, device['name']) -%}
+{% set STATE_TYPE = hardware_device_t if is_hardware else simulation_device_t-%}
+
 // (Queue) send functions
 
 // Note: buffer pointers point to the next available slot
@@ -15,9 +22,14 @@ struct {{ msg_struct }} {
 	{%- endfor %}
 };
 
-void send_{{ id }}(node_state_t *deviceState, {{ msg_struct }} *msg) {
+void send_{{ id }}({{ STATE_TYPE }} *deviceState, {{ msg_struct }} *msg) {
 
 	uint32_t ind = (deviceState->{{ id }}_buffer_ptr)++;
+
+	if (ind >= {{ software_buffer_size }} ) {
+		handler_log(2, "Error, outgoing {{ id }} message buffer is full");
+		handler_exit(1);
+	}
 
 	deviceState->{{ id }}_buffer_dst[ind] = msg->dst;
 
