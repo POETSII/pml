@@ -15,15 +15,10 @@ def sim():
     """Run application remotely."""
     local_file = "tmp/output.xml"
     put(local_file, "/tmp/input.xml")
-    run_script("simulate.sh")
+    run_script_remotely("simulate.sh")
 
 
-def write_file(text, file):
-    with open(file, "w") as fid:
-        fid.write(text)
-
-
-def run_script(script_file, quiet=False):
+def run_script_remotely(script_file, quiet=False):
     local_file = "scripts/%s" % script_file
     put(local_file, "/tmp", mirror_local_mode=True)
     with cd("/tmp"):
