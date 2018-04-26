@@ -66,7 +66,7 @@ def parse_params(param_list):
 
     Each item in the list is a string in the form 'name:value'.
 
-    Inputs:
+    Args:
       param_list (list): list of parameter strings
 
     Returns:
