@@ -20,6 +20,10 @@ def generate_xml(template, graph, env_globals=dict(), content=dict()):
 
     'template' can either be a filename or a template string."""
 
+    # TODO: docstring says this function accepts a filename as 'template' but
+    # 'template_str' below appears to be deadcode. Investigate and correct if
+    # necessary.
+
     is_file = os.path.isfile(template)
 
     template_str = load_text(template) if is_file else template
