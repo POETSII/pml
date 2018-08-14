@@ -22,8 +22,17 @@ Options:
   -i, --info         Print graph traversal information.
   -w, --workers <n>  Use n parallel workers [default: 1].
   -p, --psuedo       Use psuedo-randomization.
+  -f, --fantasi      Parse FANTASI-formatted node list.
 
 """
+
+def parse_fantasi_nodes(fantasi_nodes):
+    """Convert node format.
+
+    In FANTASI, nodes are referred to with zero-based indices. This function
+    converts these to one-based %06d strings.
+    """
+    return ["%06d" % (n+1) for n in map(int, fantasi_nodes)]
 
 
 def main():
@@ -37,17 +46,26 @@ def main():
 
         if args["<node_list>"]:
             nodes = args["<node_list>"].split()
+            if args["--fantasi"]:
+                nodes = parse_fantasi_nodes(nodes)
             non_existent = set(nodes) - set(graph.nodes)
             if non_existent:
                 raise Exception("Non-existent node(s): %s" ", ".join(non_existent))
 
         if args["disable"]:
             disabled = args["<node_list>"].split()
-            graph = Graph.reduce_graph(lambda node: node not in disabled)
+            if args["--fantasi"]:
+                disabled = parse_fantasi_nodes(disabled)
+            graph = graph.reduce_graph(lambda node: node not in disabled)
+            for src, dst in graph.get_edge_list():
+                if src < dst:
+                    print "%s -> %s" % (src, dst)
 
         if args["enable"]:
             enabled = args["<node_list>"].split()
-            graph = Graph.reduce_graph(lambda node: node in enabled)
+            if args["--fantasi"]:
+                enabled = parse_fantasi_nodes(enabled)
+            graph = graph.reduce_graph(lambda node: node in enabled)
 
         print get_apl(graph, verbose=args["--info"])
 
