@@ -57,7 +57,17 @@ if (replies == required_replies) {
 			}
 
 			handler_log(1, "Total discovered = %d nodes", total_nodes);
-			handler_exit(0);
+
+			int OP_COUNT = 1000;
+
+			if (deviceState->operation_counter >= OP_COUNT-1) {
+				handler_log(3, "End of operations.");
+				handler_exit(0);
+			} else {
+				(deviceState->operation_counter)++; // increment traversal counter
+				soft_clear_state(deviceState, deviceProperties);
+			}
+
 
 		}
 

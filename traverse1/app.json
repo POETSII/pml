@@ -14,6 +14,9 @@
                 },
                 "hoplimit": {
                     "doc": "How many further steps to propagate request"
+                },
+                "operation": {
+                    "doc": "Unique traversal operation identifier"
                 }
             }
         },
@@ -56,7 +59,9 @@
             "discovered_counts": {
                 "length": 100
             },
-            "iteration": {}
+            "iteration": {},
+            "operation_counter": {},
+            "last_operation": {}
         }
     }
 }

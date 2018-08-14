@@ -47,6 +47,7 @@ bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
 	outgoing.iteration = iteration;
 	outgoing.callback = 0; // index of root request object in requests table
 	outgoing.hoplimit = iteration - 1;
+	outgoing.operation = deviceState->operation_counter;
 
 	send_req(deviceState, &outgoing);
 
@@ -57,4 +58,35 @@ bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
 	deviceState->iteration = iteration;
 
 	return true; // success
+}
+
+void soft_clear_state(node_state_t* deviceState, node_props_t* deviceProperties) {
+
+	deviceState->req_counter = 0;
+
+	for (int i=0; i<1000; i++) {
+		deviceState->requests_tbl_occupied[i] = 0;
+		deviceState->requests_tbl_discovered_sum[i] = 0;
+		deviceState->requests_tbl_replies_received[i] = 0;
+		deviceState->requests_tbl_requester[i] = 0;
+		deviceState->requests_tbl_callback[i] = 0;
+	}
+
+	for (int i=0; i<100; i++) {
+		deviceState->hoplimits[i] = 0;
+		deviceState->discovered_counts[i] = 0;
+	}
+
+	bool is_center = deviceProperties->id == 0;
+
+	const uint32_t UNSET_DISTANCE = 0xFFFFFFFF;
+
+	deviceState->distance = is_center ? 0 : UNSET_DISTANCE;
+
+	if (is_center) {
+		deviceState->discovered_counts[0] = 1; // just center node is at distance 0
+	    handler_log(1, "Start traversal");
+	    start_iteration(deviceState, 1);
+	}
+
 }

@@ -7,6 +7,20 @@ handler_log(2, "received msg from %d, iteration = %d, hoplimit = %d",
     message->iteration,
     message->hoplimit);
 
+if (message->operation != deviceState->last_operation) {
+
+    // This message marks the beginning of a new operation. Perform a (soft)
+    // clear of device state.
+
+    handler_log(2, "New operation");
+
+    if (deviceProperties->id != 0)
+        soft_clear_state(deviceState, deviceProperties);
+
+    deviceState->last_operation = message->operation;
+
+}
+
 uint32_t min_hoplimit = deviceState->hoplimits[message->iteration];
 
 if (message->hoplimit > min_hoplimit) {
@@ -35,6 +49,7 @@ if (message->hoplimit > min_hoplimit) {
     outgoing.iteration = message->iteration;
     outgoing.callback = req_ind;
     outgoing.hoplimit = message->hoplimit - 1;
+    outgoing.operation = message->operation;
 
     send_req(deviceState, &outgoing);
 
