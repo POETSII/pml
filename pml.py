@@ -104,8 +104,10 @@ def parse_params(param_list):
 
 def main():
     args = docopt(usage, version="pml v0.1")
-    xml = build(args["<app.json>"], args["<file.graphml>"],
-                parse_params(args["--param"]))
+    app_file = args["<app.json>"]
+    graphml_file = args["<file.graphml>"]
+    params = parse_params(args["--param"])
+    xml = build(app_file, graphml_file, params)
     print xml
 
 

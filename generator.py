@@ -29,6 +29,14 @@ def generate_xml(template, graph, env_globals=dict(), content=dict()):
     template_str = load_text(template) if is_file else template
     template_dir = os.path.split(template)[0] if is_file else '.'
 
+    # Rename nodes if not suitable for code generation
+
+    start_with_num = any(node[0].isdigit() for node in graph.nodes)
+
+    if start_with_num:
+        name_map = {node: "n%s" % node for node in graph.nodes}
+        graph.map_node_names(name_map)
+
     # Create jinja template content
 
     content = join_dicts({"graph": graph}, content)
