@@ -2,7 +2,7 @@ if (message->dst != 0xFFFFFFFF) // if not a broadcast
     if (message->dst != deviceProperties->id) // ... and not directed at this node
         return; // don't process incoming message
 
-handler_log(2, "received msg from %d, iteration = %d, hoplimit = %d",
+handler_log(3, "received msg from %d, iteration = %d, hoplimit = %d",
     message->src,
     message->iteration,
     message->hoplimit);
@@ -30,14 +30,14 @@ if (message->hoplimit > min_hoplimit) {
     // 1. Create a requests table entry with the details to acknowledge this
     // request in the future.
 
-    handler_log(2, "Creating new requests entry ...");
+    handler_log(3, "Creating new requests entry ...");
 
     int req_ind = create_request(deviceState, message->src, message->callback);
 
     if (req_ind >= 0) {
-        handler_log(2, "Inserted new entry in requests table (slot %d)", req_ind);
+        handler_log(3, "Inserted new entry in requests table (slot %d)", req_ind);
     } else {
-        handler_log(2, "Error, requests table is full");
+        handler_log(1, "Error, requests table is full");
         handler_exit(1);
     }
 
@@ -65,13 +65,13 @@ if (message->hoplimit > min_hoplimit) {
 
     // Send an ack message back
 
-    handler_log(2, "Sending ack message back to %d ...", message->src);
+    handler_log(3, "Sending ack message back to %d ...", message->src);
 
     bool distance_unset = deviceState->distance == 0xFFFFFFFF;
 
     if (distance_unset) {
         deviceState->distance = message->iteration;
-        handler_log(2, "I am at distance %d from center", deviceState->distance);
+        handler_log(3, "I am at distance %d from center", deviceState->distance);
     }
 
     ack_msg outgoing;

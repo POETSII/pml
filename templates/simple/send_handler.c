@@ -1,6 +1,6 @@
 if (deviceState->{{ msg }}_buffer_ptr == 0) {
 	// If this is executed, it is most likely due to an error in ready_to_send
-	handler_log(2, "Error, attempted to send while buffer is empty");
+	handler_log(1, "Error, attempted to send while buffer is empty");
 	handler_exit(1);
 }
 

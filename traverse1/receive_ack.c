@@ -5,10 +5,10 @@ if (!is_broadcast && !is_intended_recipient) return;
 
 uint32_t ind = message->callback;
 
-handler_log(2, "received ack from %d (callback %d)", message->src, ind);
+handler_log(4, "received ack from %d (callback %d)", message->src, ind);
 
 if (deviceState->requests_tbl_occupied[ind] == 0) {
-	handler_log(2, "Error, invalid callback! Slot %d in requests table is empty", ind);
+	handler_log(1, "Error, invalid callback! Slot %d in requests table is empty", ind);
 	handler_exit(1);
 }
 
@@ -18,7 +18,7 @@ deviceState->requests_tbl_discovered_sum[ind] += message->discovered;
 
 uint32_t required_replies = deviceProperties->outdegree;
 
-handler_log(2, "%d/%d replies for this request so far", replies, required_replies);
+handler_log(4, "%d/%d replies for this request so far", replies, required_replies);
 
 if (replies == required_replies) {
 
@@ -32,7 +32,7 @@ if (replies == required_replies) {
 
 		deviceState->discovered_counts[deviceState->iteration] = discovered;
 
-		handler_log(1, "Iteration %d completed (total discovered = %d)", deviceState->iteration, discovered);
+		handler_log(2, "Iteration %d completed (total discovered = %d)", deviceState->iteration, discovered);
 
 		bool cont = discovered > 0; // continue if non-zero nodes have been discovered
 
@@ -44,7 +44,7 @@ if (replies == required_replies) {
 
 		} else {
 
-			handler_log(1, "Traversal completed");
+			handler_log(2, "Traversal completed");
 
 			uint32_t final_iteration = deviceState->iteration;
 
@@ -52,16 +52,16 @@ if (replies == required_replies) {
 
 			for (uint32_t i=0; i < final_iteration; i++) {
 				uint32_t discovered_i = deviceState->discovered_counts[i];
-				handler_log(1, "Discovered at iteration %d = %d nodes", i, discovered_i);
+				handler_log(2, "Discovered at iteration %d = %d nodes", i, discovered_i);
 				total_nodes += discovered_i;
 			}
 
-			handler_log(1, "Total discovered = %d nodes", total_nodes);
+			handler_log(2, "Total discovered = %d nodes", total_nodes);
 
 			uint32_t OP_COUNT = {{ constants["OPERATION_COUNT"] }};
 
 			if (deviceState->operation_counter >= OP_COUNT-1) {
-				handler_log(3, "End of operations.");
+				handler_log(1, "Finished (%d operations)", OP_COUNT);
 				handler_exit(0);
 			} else {
 				(deviceState->operation_counter)++; // increment traversal counter
@@ -73,7 +73,7 @@ if (replies == required_replies) {
 
 	} else {
 
-		handler_log(2, "Received all replies, sending ack back to parent %d (callback %d, discovered = %d) ...",
+		handler_log(3, "Received all replies, sending ack back to parent %d (callback %d, discovered = %d) ...",
 			parent, callback, discovered);
 
 		ack_msg outgoing;

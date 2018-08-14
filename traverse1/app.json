@@ -3,8 +3,8 @@
     "model": "simple",
     "doc": "Network Traversal Application",
     "constants": {
-        "TABLE_SIZE": 999,
-        "OPERATION_COUNT": 123
+        "TABLE_SIZE": 512,
+        "OPERATION_COUNT": 1000
     },
     "messages": {
         "req": {
