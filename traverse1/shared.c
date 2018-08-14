@@ -1,4 +1,4 @@
-int create_request(node_state_t *deviceState, uint32_t requester, uint32_t callback) {
+int create_request(network_node_state_t *deviceState, uint32_t requester, uint32_t callback) {
 
 	// Determine next available slot in requests table
 
@@ -22,7 +22,7 @@ int create_request(node_state_t *deviceState, uint32_t requester, uint32_t callb
 	return req_ind; // return request index (non-negative return value indicates success)
 }
 
-bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
+bool start_iteration(network_node_state_t *deviceState, uint32_t iteration) {
 
 	// clear hoplimit
 
@@ -61,7 +61,7 @@ bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
 	return true; // success
 }
 
-void soft_clear_state(node_state_t* deviceState, node_props_t* deviceProperties) {
+void soft_clear_state(network_node_state_t* deviceState, const network_node_properties_t* deviceProperties) {
 
 	deviceState->req_counter = 0;
 
