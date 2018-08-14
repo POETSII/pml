@@ -58,7 +58,7 @@ if (replies == required_replies) {
 
 			handler_log(1, "Total discovered = %d nodes", total_nodes);
 
-			int OP_COUNT = 1000;
+			uint32_t OP_COUNT = {{ constants["OPERATION_COUNT"] }};
 
 			if (deviceState->operation_counter >= OP_COUNT-1) {
 				handler_log(3, "End of operations.");

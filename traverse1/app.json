@@ -2,6 +2,10 @@
     "type": "network",
     "model": "simple",
     "doc": "Network Traversal Application",
+    "constants": {
+        "TABLE_SIZE": 999,
+        "OPERATION_COUNT": 123
+    },
     "messages": {
         "req": {
             "doc": "Request a node to traverse its neighbours",
@@ -41,19 +45,19 @@
                 "length": 100
             },
             "requests_tbl_occupied": {
-                "length": 1000
+                "length": "TABLE_SIZE"
             },
             "requests_tbl_discovered_sum": {
-                "length": 1000
+                "length": "TABLE_SIZE"
             },
             "requests_tbl_replies_received": {
-                "length": 1000
+                "length": "TABLE_SIZE"
             },
             "requests_tbl_requester": {
-                "length": 1000
+                "length": "TABLE_SIZE"
             },
             "requests_tbl_callback": {
-                "length": 1000
+                "length": "TABLE_SIZE"
             },
             "distance": {},
             "discovered_counts": {

@@ -60,9 +60,10 @@
                     {%- set property_items = device.get('properties', {}).items() %}
                     {%- for p_id, p_content in property_items %}
                     {%- set p_type = p_content.get('type', 'uint32_t') -%}
-                    {%- set is_array = 'length' in p_content -%}
+                    {%- set p_length = get_field_length(p_content) -%}
+                    {%- set is_array = p_length > 1 -%}
                     {%- if is_array %}
-                    <Array name="{{ p_id }}" type="{{ p_type }}" length="{{ p_content['length'] }}"></Array>
+                    <Array name="{{ p_id }}" type="{{ p_type }}" length="{{ p_length }}"></Array>
                     {%- else %}
                     <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
                     {%- endif %}
@@ -74,9 +75,10 @@
                     <!-- Device state fields: -->
                     {% for s_id, s_content in device['state'].items() %}
                     {%- set p_type = s_content.get('type', 'uint32_t') -%}
-                    {%- set is_array = 'length' in s_content -%}
+                    {%- set s_length = get_field_length(s_content) -%}
+                    {%- set is_array = s_length > 1 -%}
                     {%- if is_array %}
-                    <Array name="{{ s_id }}" type="{{ p_type }}" length="{{ s_content['length'] }}"></Array>
+                    <Array name="{{ s_id }}" type="{{ p_type }}" length="{{ s_length }}"></Array>
                     {%- else %}
                     <Scalar name="{{ s_id }}" type="{{ p_type }}"></Scalar>
                     {%- endif %}

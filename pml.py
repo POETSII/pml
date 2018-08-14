@@ -31,6 +31,13 @@ def build(app_file, graphml_file, params=dict()):
 
     """
 
+    def read_json(file):
+        """Read a JSON file."""
+        with open(file, "r") as fid:
+            return json.load(fid)
+
+    content = read_json(app_file)
+
     def include_app_file(file, optional=False):
         """Return content of file in app directory.
 
@@ -48,16 +55,29 @@ def build(app_file, graphml_file, params=dict()):
         elif optional: return ''
         else: raise Exception('Required file %s not found' % file)
 
-    def read_json(file):
-        """Read a JSON file."""
-        with open(file, "r") as fid:
-            return json.load(fid)
+    def get_field_length(field):
 
-    content = read_json(app_file)
+        if "length" not in field:
+            return 1  # scalar
+
+        flen = field["length"]
+
+        if type(flen) is int:
+            return flen
+        if (type(flen) is unicode) and (flen in params):
+            return params[flen]
+        if (type(flen) is unicode) and (flen in content["constants"]):
+            return content["constants"][flen]
+
+        raise Exception("Could not determine length of field %s" % field)
+
     content['params'] = params
     graph = Graph(graphml_file)
     template = 'templates/%s/template.xml' % content["model"]
-    env_globals = {'include_app': include_app_file}
+    env_globals = {
+        'include_app': include_app_file,
+        'get_field_length': get_field_length
+    }
     xml = generate_xml(template, graph, env_globals, content)
     return xml
 

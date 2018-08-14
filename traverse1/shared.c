@@ -4,9 +4,12 @@ int create_request(node_state_t *deviceState, uint32_t requester, uint32_t callb
 
 	int req_ind = 0;
 
-	while (deviceState->requests_tbl_occupied[req_ind] && (req_ind < 1000)) req_ind++;
+	while (deviceState->requests_tbl_occupied[req_ind] && (req_ind < {{ constants["TABLE_SIZE"] }})) req_ind++;
 
-	if (req_ind == 1000) return -1; // fail if table is full
+	if (req_ind == {{ constants["TABLE_SIZE"] }}) {
+		handler_log(1, "Request table full, could not create new request.");
+		handler_exit(1);
+	}
 
 	// insert request into available slot (req_ind)
 
@@ -28,7 +31,7 @@ bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
 
 	// clear requests table
 
-	for (int i=0; i<1000; i++)
+	for (int i=0; i<{{ constants["TABLE_SIZE"] }}; i++)
 	    deviceState->requests_tbl_occupied[i] = 0;
 
 	// Insert a dummy request entry in the requests table to kick-start the
@@ -36,8 +39,6 @@ bool start_iteration(node_state_t *deviceState, uint32_t iteration) {
 	// and it is inserted at index 0 in the table.
 
 	int req_ind = create_request(deviceState, 0, -1);
-
-	if (req_ind == 1000) return false; // fail if table is full
 
 	// Now broadcast a request to neighbours
 
@@ -64,7 +65,7 @@ void soft_clear_state(node_state_t* deviceState, node_props_t* deviceProperties)
 
 	deviceState->req_counter = 0;
 
-	for (int i=0; i<1000; i++) {
+	for (int i=0; i<{{ constants["TABLE_SIZE"] }}; i++) {
 		deviceState->requests_tbl_occupied[i] = 0;
 		deviceState->requests_tbl_discovered_sum[i] = 0;
 		deviceState->requests_tbl_replies_received[i] = 0;
