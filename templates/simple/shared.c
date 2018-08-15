@@ -1,9 +1,4 @@
-{% set software_buffer_size = params.get('sbufsize', 1000) -%}
-{% set target = params.get('target', 'hardware') -%}
-{% set is_hardware = target == 'hardware' -%}
-{% set simulation_device_t = "%s_state_t" % device['name'] -%}
-{% set hardware_device_t = "%s_%s_state_t" % (type, device['name']) -%}
-{% set STATE_TYPE = hardware_device_t if is_hardware else simulation_device_t-%}
+{% set STATE_TYPE = "%s_%s_state_t" % (type, device['name']) -%}
 
 // (Queue) send functions
 
@@ -26,13 +21,10 @@ void send_{{ id }}({{ STATE_TYPE }} *deviceState, {{ msg_struct }} *msg) {
 
 	uint32_t ind = (deviceState->{{ id }}_buffer_ptr)++;
 
-	// The check below is commented out for the moment because handler_* can't
-	// be used in <SharedCode>.
-	//
-	// if (ind >= {{ software_buffer_size }} ) {
-	// 	handler_log(2, "Error, outgoing {{ id }} message buffer is full");
-	// 	handler_exit(1);
-	// }
+	if (ind >= SOFTWARE_BUFF_SIZE ) {
+		handler_log(1, "Error, outgoing {{ id }} message buffer is full");
+		handler_exit(1);
+	}
 
 	deviceState->{{ id }}_buffer_dst[ind] = msg->dst;
 

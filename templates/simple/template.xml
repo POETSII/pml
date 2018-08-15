@@ -9,6 +9,8 @@
 
         <SharedCode><![CDATA[
 
+#define SOFTWARE_BUFF_SIZE {{ software_buffer_size }}
+
 {{ include('shared.c') }}
 
 {{ include_app('shared.c', optional=True) }}

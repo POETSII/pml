@@ -39,7 +39,7 @@ if (replies == required_replies) {
 		if (cont) {
 
 			uint32_t next_iteration = deviceState->iteration + 1;
-			handler_log(2, "Start iteration %d", next_iteration);
+			handler_log(1, "Start iteration %d", next_iteration);
 			start_iteration(deviceState, next_iteration);
 
 		} else {
@@ -64,7 +64,8 @@ if (replies == required_replies) {
 				handler_log(1, "Finished (%d operations)", OP_COUNT);
 				handler_exit(0);
 			} else {
-				(deviceState->operation_counter)++; // increment traversal counter
+				int new_op = ++(deviceState->operation_counter); // increment traversal counter
+				handler_log(1, "Starting operation %d ...", new_op);
 				soft_clear_state(deviceState, deviceProperties);
 			}
 

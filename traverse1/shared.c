@@ -6,7 +6,7 @@ int create_request(network_node_state_t *deviceState, uint32_t requester, uint32
 
 	while (deviceState->requests_tbl_occupied[req_ind] && (req_ind < {{ constants["TABLE_SIZE"] }})) req_ind++;
 
-	if (req_ind == {{ constants["TABLE_SIZE"] }}) {
+	if (req_ind >= {{ constants["TABLE_SIZE"] }}) {
 		handler_log(1, "Request table full, could not create new request.");
 		handler_exit(1);
 	}

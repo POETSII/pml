@@ -3,23 +3,27 @@
     "model": "simple",
     "doc": "Network Traversal Application",
     "constants": {
-        "TABLE_SIZE": 512,
-        "OPERATION_COUNT": 1000
+        "TABLE_SIZE": 256,
+        "OPERATION_COUNT": 10
     },
     "messages": {
         "req": {
             "doc": "Request a node to traverse its neighbours",
             "fields": {
                 "callback": {
+                    "type": "uint16_t",
                     "doc": "Callback ticket number to quote when sending ack"
                 },
                 "iteration": {
+                    "type": "uint16_t",
                     "doc": "Number of iteration the request belongs to"
                 },
                 "hoplimit": {
+                    "type": "uint16_t",
                     "doc": "How many further steps to propagate request"
                 },
                 "operation": {
+                    "type": "uint16_t",
                     "doc": "Unique traversal operation identifier"
                 }
             }
@@ -28,9 +32,11 @@
             "doc": "Acknowledge completion of a traversal request",
             "fields": {
                 "callback": {
+                    "type": "uint16_t",
                     "doc": "Callback ticket number"
                 },
                 "discovered": {
+                    "type": "int16_t",
                     "doc": "How many new nodes have been discovered"
                 }
             }
@@ -42,25 +48,32 @@
         "state": {
             "req_counter": {},
             "hoplimits": {
+                "type": "uint16_t",
                 "length": 100
             },
             "requests_tbl_occupied": {
+                "type": "uint16_t",
                 "length": "TABLE_SIZE"
             },
             "requests_tbl_discovered_sum": {
+                "type": "uint16_t",
                 "length": "TABLE_SIZE"
             },
             "requests_tbl_replies_received": {
+                "type": "uint16_t",
                 "length": "TABLE_SIZE"
             },
             "requests_tbl_requester": {
+                "type": "uint16_t",
                 "length": "TABLE_SIZE"
             },
             "requests_tbl_callback": {
+                "type": "int16_t",
                 "length": "TABLE_SIZE"
             },
             "distance": {},
             "discovered_counts": {
+                "type": "uint16_t",
                 "length": 100
             },
             "iteration": {},
