@@ -57,19 +57,8 @@ if (replies == required_replies) {
 			}
 
 			handler_log(2, "Total discovered = %d nodes", total_nodes);
-
-			uint32_t OP_COUNT = {{ constants["OPERATION_COUNT"] }};
-
-			if (deviceState->operation_counter >= OP_COUNT-1) {
-				handler_log(1, "Finished (%d operations)", OP_COUNT);
-				handler_exit(0);
-			} else {
-				int new_op = ++(deviceState->operation_counter); // increment traversal counter
-				handler_log(1, "Starting operation %d ...", new_op);
-				soft_clear_state(deviceState, deviceProperties);
-			}
-
-
+			handler_log(1, "Finished operation (%d)", deviceState->operation_counter);
+			next_operation(deviceState, deviceProperties);
 		}
 
 	} else {

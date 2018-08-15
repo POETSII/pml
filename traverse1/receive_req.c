@@ -71,7 +71,7 @@ if (message->hoplimit > min_hoplimit) {
 
     if (distance_unset) {
         deviceState->distance = message->iteration;
-        handler_log(3, "I am at distance %d from center", deviceState->distance);
+        handler_log(3, "I am at distance %d from center (%d)", deviceState->distance, deviceProperties->id);
     }
 
     ack_msg outgoing;

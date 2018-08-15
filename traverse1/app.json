@@ -4,7 +4,7 @@
     "doc": "Network Traversal Application",
     "constants": {
         "TABLE_SIZE": 256,
-        "OPERATION_COUNT": 10
+        "OPERATION_COUNT": 3
     },
     "messages": {
         "req": {

@@ -86,12 +86,11 @@ void soft_clear_state(network_node_state_t* deviceState, const network_node_prop
 	const uint32_t UNSET_DISTANCE = 0xFFFFFFFF;
 
 	if (is_center_node(deviceProperties)) {
-		deviceState->discovered_counts[0] = 1; // just center node is at distance 0
-	    handler_log(2, "Start traversal");
-	    start_iteration(deviceState, 1);
 	    deviceState->distance = 0;
 	} else {
 	    deviceState->distance = UNSET_DISTANCE;
 	}
 
 }
+
+{{ include("mapreduce.c") }}
