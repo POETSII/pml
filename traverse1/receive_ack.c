@@ -72,8 +72,10 @@ if (replies == required_replies) {
 		outgoing.callback = callback;
 		outgoing.discovered = discovered;
 
-		send_ack(deviceState, &outgoing);
+		if (discovered)
+			reverse_visitor(deviceState, deviceProperties, discovered);
 
+		send_ack(deviceState, &outgoing);
 	}
 
 }

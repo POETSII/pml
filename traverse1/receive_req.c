@@ -72,6 +72,7 @@ if (message->hoplimit > min_hoplimit) {
     if (distance_unset) {
         deviceState->distance = message->iteration;
         handler_log(3, "I am at distance %d from center (%d)", deviceState->distance, deviceProperties->id);
+        forward_visitor(deviceState, deviceProperties, deviceState->distance);
     }
 
     ack_msg outgoing;
@@ -79,6 +80,9 @@ if (message->hoplimit > min_hoplimit) {
     outgoing.dst = message->src;
     outgoing.callback = message->callback;
     outgoing.discovered = distance_unset ? 1 : 0;
+
+    if (outgoing.discovered)
+        reverse_visitor(deviceState, deviceProperties, outgoing.discovered);
 
     send_ack(deviceState, &outgoing);
 
