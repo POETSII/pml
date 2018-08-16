@@ -5,6 +5,7 @@ import json
 
 from graph import Graph
 from docopt import docopt
+from pretty import prettify_xml
 from generator import generate_xml
 from generator import get_path
 
@@ -14,8 +15,9 @@ Usage:
   pml.py [options] <app.json> <file.graphml>
 
 Options:
-  -p, --param <name:value>  Specify code generation parameter(s).
-  -o, --props <file.json>   Load property values from file.
+  --param <name:value>  Specify code generation parameter(s).
+  --props <file.json>   Load property values from file.
+  --pretty              Pretty-print XML using xmllint.
 
 """
 
@@ -141,7 +143,6 @@ def parse_params(param_str):
 
     return {name: value for name, value in map(split_param, param_list)}
 
-
 def main():
     args = docopt(usage, version="pml v0.1")
     app_file = args["<app.json>"]
@@ -149,7 +150,7 @@ def main():
     graphml_file = args["<file.graphml>"]
     params = parse_params(args["--param"] or "")
     xml = build(app_file, graphml_file, props_file, params)
-    print xml
+    print prettify_xml(xml) if args["--pretty"] else xml
 
 
 if __name__ == "__main__":
