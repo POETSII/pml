@@ -44,7 +44,9 @@
     },
     "device": {
         "name": "node",
-        "properties": {},
+        "properties": {
+            "popvector": {}
+        },
         "state": {
             "req_counter": {},
             "hoplimits": {

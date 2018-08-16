@@ -149,7 +149,9 @@
       <DeviceInstances>
           {%- for node in graph.nodes %}
           <DevI id="{{ node }}" type="node">
-            <P>"id": {{ loop.index0 }}, "outdegree": {{ graph.get_outdegree(node) }}</P>
+            <P>
+                "id": {{ loop.index0 }}, "outdegree": {{ graph.get_outdegree(node) }} {{ ", " + props[node] if props }}
+            </P>
           </DevI>
           {%- endfor %}
       </DeviceInstances>
