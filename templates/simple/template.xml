@@ -1,4 +1,4 @@
-{% set software_buffer_size = params.get('sbufsize', 1000) -%}
+@ set software_buffer_size = params.get('sbufsize', 1000)
 
 <?xml version="1.0"?>
 <Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
@@ -7,15 +7,14 @@
         <MetaData>&quot;native_dimension&quot;:2</MetaData>
         <Properties/>
 
-        <SharedCode><![CDATA[
+        <SharedCode>
+            <![CDATA[
+            #define SOFTWARE_BUFF_SIZE {{ software_buffer_size }}
+            {{ include('shared.c') }}
+            {{ include_app('shared.c', optional=True) }}
+            ]]>
 
-#define SOFTWARE_BUFF_SIZE {{ software_buffer_size }}
-
-{{ include('shared.c') }}
-
-{{ include_app('shared.c', optional=True) }}
-
-        ]]></SharedCode>
+        </SharedCode>
 
         <MessageTypes>
 
@@ -23,34 +22,30 @@
                 <Documentation>Initialize state</Documentation>
             </MessageType>
 
-            {% for id, content in messages.items() %}
+            @ for id, content in messages.items()
             <MessageType id="{{ id }}">
                 <Documentation>{{ content['doc'] }}</Documentation>
                 <Message>
                     <Scalar type="uint32_t" name="src">
-                        <Documentation>
-                            Source node id
-                        </Documentation>
+                        <Documentation>Source node id</Documentation>
                     </Scalar>
                     <Scalar type="uint32_t" name="dst">
-                        <Documentation>
-                            Destination node id
-                        </Documentation>
+                        <Documentation>Destination node id</Documentation>
                     </Scalar>
-                    {%- set field_items = content.get('fields', {}).items() %}
-                    {%- for fd_id, fd_content in field_items %}
-                    {%- set fd_type = fd_content.get('type', 'uint32_t') %}
+                    @ set field_items = content.get('fields', {}).items()
+                    @ for fd_id, fd_content in field_items
+                    @ set fd_type = fd_content.get('type', 'uint32_t')
                     <Scalar type="{{ fd_type }}" name="{{ fd_id }}">
-                        {%- if 'doc' in fd_content %}
+                        @ if 'doc' in fd_content
                         <Documentation>
-                            {{ fd_content['doc'] }}
+                            {{- fd_content['doc'] -}}
                         </Documentation>
-                        {%- endif %}
+                        @ endif
                     </Scalar>
-                    {%- endfor %}
+                    @ endfor
                 </Message>
             </MessageType>
-            {% endfor %}
+            @ endfor
         </MessageTypes>
 
         <DeviceTypes>
@@ -59,50 +54,50 @@
                 <Properties>
                     <Scalar name="id" type="uint32_t"></Scalar>
                     <Scalar name="outdegree" type="uint32_t"></Scalar>
-                    {%- set property_items = device.get('properties', {}).items() %}
-                    {%- for p_id, p_content in property_items %}
-                    {%- set p_type = p_content.get('type', 'uint32_t') -%}
-                    {%- set p_length = get_field_length(p_content) -%}
-                    {%- set is_array = p_length > 1 -%}
-                    {%- if is_array %}
+                    @ set property_items = device.get('properties', {}).items()
+                    @ for p_id, p_content in property_items
+                    @ set p_type = p_content.get('type', 'uint32_t')
+                    @ set p_length = get_field_length(p_content)
+                    @ set is_array = p_length > 1
+                    @ if is_array
                     <Array name="{{ p_id }}" type="{{ p_type }}" length="{{ p_length }}"></Array>
-                    {%- else %}
+                    @ else
                     <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
-                    {%- endif %}
-                    {%- endfor %}
+                    @ endif
+                    @ endfor
                 </Properties>
 
                 <State>
 
                     <!-- Device state fields: -->
-                    {% for s_id, s_content in device['state'].items() %}
-                    {%- set p_type = s_content.get('type', 'uint32_t') -%}
-                    {%- set s_length = get_field_length(s_content) -%}
-                    {%- set is_array = s_length > 1 -%}
-                    {%- if is_array %}
+                    @ for s_id, s_content in device['state'].items()
+                    @ set p_type = s_content.get('type', 'uint32_t')
+                    @ set s_length = get_field_length(s_content)
+                    @ set is_array = s_length > 1
+                    @ if is_array
                     <Array name="{{ s_id }}" type="{{ p_type }}" length="{{ s_length }}"></Array>
-                    {%- else %}
+                    @ else
                     <Scalar name="{{ s_id }}" type="{{ p_type }}"></Scalar>
-                    {%- endif %}
-                    {%- endfor %}
+                    @ endif
+                    @ endfor
 
-                    {% for id, content in messages.items() %}
+                    @ for id, content in messages.items()
                     <!-- Software buffer for (outgoing) {{ id }} messages: -->
 
                     <Array name="{{ id }}_buffer_dst" type="uint32_t" length="{{ software_buffer_size }}"></Array>
                     <Scalar name="{{ id }}_buffer_ptr" type="uint32_t"></Scalar>
-                    {%- set field_items = content.get('fields', {}).items() %}
-                    {%- for fd_id, fd_content in field_items %}
+                    @ set field_items = content.get('fields', {}).items()
+                    @ for fd_id, fd_content in field_items
                     <Array name="{{ id }}_buffer_{{ fd_id }}" type="{{ fd_content.get('type', 'uint32_t') }}" length="{{ software_buffer_size }}"></Array>
-                    {%- endfor %}
-                    {% endfor %}
+                    @ endfor
+                    @ endfor
 
                 </State>
 
                 <ReadyToSend>
                     <![CDATA[
 
-{{ include('ready_to_send.c') }}
+                    {{ include('ready_to_send.c') }}
 
                     ]]>
                 </ReadyToSend>
@@ -111,19 +106,19 @@
                     <OnReceive>
                         <![CDATA[
 
-{{ include_app('init.c', optional=True) }}
+                        {{ include_app('init.c', optional=True) }}
 
                         ]]>
                     </OnReceive>
                 </InputPin>
 
-                {% for msg, content in messages.items() %}
+                @ for msg, content in messages.items()
 
                 <InputPin messageTypeId="{{ msg }}" name="{{ msg }}_in">
                     <OnReceive>
                         <![CDATA[
 
-{{ include_app('receive_%s.c' % msg) }}
+                        {{ include_app('receive_%s.c' % msg) }}
 
                         ]]>
                     </OnReceive>
@@ -133,13 +128,13 @@
                     <OnSend>
                         <![CDATA[
 
-{{ include('send_handler.c', msg=msg, fields=content.get('fields', {} )) }}
+                        {{ include('send_handler.c', msg=msg, fields=content.get('fields', {} )) }}
 
                         ]]>
                     </OnSend>
                 </OutputPin>
 
-                {% endfor %}
+                @ endfor
 
             </DeviceType>
 
@@ -147,20 +142,18 @@
     </GraphType>
     <GraphInstance id="graph1" graphTypeId="{{ type }}">
       <DeviceInstances>
-          {%- for node in graph.nodes %}
+          @ for node in graph.nodes
           <DevI id="{{ node }}" type="node">
-            <P>
-                "id": {{ loop.index0 }}, "outdegree": {{ graph.get_outdegree(node) }} {{ ", " + props[node] if props }}
-            </P>
-          </DevI>
-          {%- endfor %}
-      </DeviceInstances>
-      <EdgeInstances>
-        {%- for src, dst in graph.get_edge_list() %}
-          {%- for msg in messages.keys() %}
-          <EdgeI path="{{ dst }}:{{ msg }}_in-{{ src }}:{{ msg }}_out"/>
-          {%- endfor %}
-        {%- endfor %}
-      </EdgeInstances>
-    </GraphInstance>
+            <P>"id": {{ loop.index0 }}, "outdegree": {{ graph.get_outdegree(node) }} {{ ", " + props[node] if props }}</P>
+        </DevI>
+        @ endfor
+    </DeviceInstances>
+    <EdgeInstances>
+        @ for src, dst in graph.get_edge_list()
+        @ for msg in messages.keys()
+        <EdgeI path="{{ dst }}:{{ msg }}_in-{{ src }}:{{ msg }}_out"/>
+        @ endfor
+        @ endfor
+    </EdgeInstances>
+</GraphInstance>
 </Graphs>

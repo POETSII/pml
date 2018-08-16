@@ -59,6 +59,7 @@ def generate_xml(template, graph, env_globals=dict(), content=dict()):
     # Prepare jinja environment
     loader = jinja2.PackageLoader(__name__, '')
     env = jinja2.Environment(loader=loader)
+    env.line_statement_prefix = '@'
     env.globals['include'] = include_template_file
     env.globals.update(env_globals)
 
