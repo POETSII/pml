@@ -1,3 +1,8 @@
+bool is_center_node(const network_node_properties_t* deviceProperties) {
+
+	return deviceProperties->id == 0;
+}
+
 int create_request(network_node_state_t *deviceState, uint32_t requester, uint32_t callback) {
 
 	// Determine next available slot in requests table
@@ -61,11 +66,6 @@ bool start_iteration(network_node_state_t *deviceState, uint32_t iteration) {
 	return true; // success
 }
 
-bool is_center_node(const network_node_properties_t* deviceProperties) {
-
-	return deviceProperties->id == 0;
-}
-
 void soft_clear_state(network_node_state_t* deviceState, const network_node_properties_t* deviceProperties) {
 
 	deviceState->req_counter = 0;
@@ -92,5 +92,3 @@ void soft_clear_state(network_node_state_t* deviceState, const network_node_prop
 	}
 
 }
-
-{{ include("mapreduce.c") }}

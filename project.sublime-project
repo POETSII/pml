@@ -8,7 +8,7 @@
                 "old",
                 "matmul",
                 "xml",
-                "networks",
+                "graphml",
                 "scripts"
             ],
             "file_exclude_patterns": []
