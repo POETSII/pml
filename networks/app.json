@@ -44,7 +44,7 @@
                     "doc": "Callback ticket number"
                 },
                 "discovered": {
-                    "type": "int16_t",
+                    "type": "uint16_t",
                     "doc": "How many new nodes have been discovered"
                 },
                 "visitor_id": {

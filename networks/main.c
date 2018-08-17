@@ -1,11 +1,11 @@
 void finish(STATE_PROP_ARGS) {
-	handler_exit(0);
+    handler_exit(0);
 }
 
 void test(STATE_PROP_ARGS) {
-	handler_log(1, "Running visitors ...");
-	uint16_t op_type = 1;
-	forward_traverse(deviceState, deviceProperties, finish, op_type);
+    handler_log(1, "Running visitors ...");
+    uint16_t op_type = 1;
+    forward_traverse(deviceState, deviceProperties, finish, op_type);
 }
 
 void start(STATE_PROP_ARGS) {
