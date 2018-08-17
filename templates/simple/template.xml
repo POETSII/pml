@@ -1,3 +1,4 @@
+@ set device_name = device.get('name', 'node')
 @ set software_buffer_size = params.get('sbufsize', 1000)
 
 <?xml version="1.0"?>
@@ -50,7 +51,7 @@
 
         <DeviceTypes>
             <!-- Generated Block -->
-            <DeviceType id="{{ device.get('name', 'node') }}">
+            <DeviceType id="{{ device_name }}">
                 <Properties>
                     <Scalar name="id" type="uint32_t"></Scalar>
                     <Scalar name="outdegree" type="uint32_t"></Scalar>
@@ -65,6 +66,11 @@
                     <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
                     @ endif
                     @ endfor
+
+                    @ for p_id, p_content in props.get(device_name, {}).items()
+                    @ set p_type = p_content.get('type', 'uint32_t')
+                    <Scalar name="{{ p_id }}" type="{{ p_type }}"></Scalar>
+                    @endfor
                 </Properties>
 
                 <State>
@@ -144,7 +150,14 @@
       <DeviceInstances>
           @ for node in graph.nodes
           <DevI id="{{ node }}" type="node">
-            <P>"id": {{ loop.index0 }}, "outdegree": {{ graph.get_outdegree(node) }} {{ ", " + props[node] if props }}</P>
+            <P>
+                "id": {{ loop.index0 }},
+                "outdegree": {{ graph.get_outdegree(node) }}
+
+                @ for p_id, p_content in props.get(device_name, {}).items()
+                , "{{ p_id }}": {{ p_content['values'][node] }}
+                @ endfor
+             </P>
         </DevI>
         @ endfor
     </DeviceInstances>

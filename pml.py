@@ -28,40 +28,8 @@ def read_json(file):
         return json.load(fid)
 
 
-def get_prop_strings(props_file):
-    """Parse a propery file.
-
-    Property files are JSON files containing a mapping node -> properties.
-
-    This function returns a corresponding mapping node -> property strings
-    where a "property string" is a string serializing of the properties
-    object, excluding the leading and training brackets.
-
-    For example, if props_file contains:
-
-    {
-        "node1": {"w": 10, "h": 10},
-        "node2": {"w": 20, "h": 20},
-    }
-
-    then this functions returns:
-
-    {
-        "node1": '"w": 10, "h": 10',
-        "node2": '"w": 20, "h": 20',
-    }
-
-    """
-
-    if not props_file:
-        return {}
-
-    return {node: json.dumps(props)[1:-1]
-            for node, props in read_json(props_file).iteritems()}
-
-
 def build(app_file, graphml_file, props_file, params=dict()):
-    """Generate an XML file from app and graph files.
+    """Generate a POETS XML file.
 
     Args:
         app_file (str): Path to application JSON file.
@@ -109,13 +77,18 @@ def build(app_file, graphml_file, props_file, params=dict()):
 
         raise Exception("Could not determine length of field %s" % field)
 
+    def get_props_string(json):
+        """Return a bracketless string representation of a JSON object."""
+        return json.dumps(json)[1:-1]
+
     content['params'] = params
-    content['props'] = get_prop_strings(props_file)
+    content['props'] = read_json(props_file)
     graph = Graph(graphml_file)
     template = 'templates/%s/template.xml' % content["model"]
     env_globals = {
         'include_app': include_app_file,
-        'get_field_length': get_field_length
+        'get_field_length': get_field_length,
+        'get_props_string': get_props_string
     }
     xml = generate_xml(template, graph, env_globals, content)
     return xml
