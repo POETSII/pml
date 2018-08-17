@@ -1,8 +1,4 @@
-void receive_ack_traversal(
-		network_node_state_t* deviceState,
-		const network_node_properties_t* deviceProperties,
-		const network_ack_message_t* message
-	) {
+void receive_ack_traversal(network_node_state_t* deviceState, const network_node_properties_t* deviceProperties, const network_ack_message_t* message) {
 
 	uint32_t ind = message->callback;
 
@@ -25,42 +21,13 @@ void receive_ack_traversal(
 
 		uint32_t parent = deviceState->requests_tbl_requester[ind];
 		int32_t callback = deviceState->requests_tbl_callback[ind];
-		uint32_t discovered = deviceState->requests_tbl_discovered_sum[ind];
+		uint16_t discovered = deviceState->requests_tbl_discovered_sum[ind];
 
 		if (callback == -1) {
 
 			// this is the root request
 
-			deviceState->discovered_counts[deviceState->iteration] = discovered;
-
-			handler_log(2, "Iteration %d completed (total discovered = %d)", deviceState->iteration, discovered);
-
-			bool cont = discovered > 0; // continue if non-zero nodes have been discovered
-
-			if (cont) {
-
-				uint32_t next_iteration = deviceState->iteration + 1;
-				handler_log(1, "Start iteration %d", next_iteration);
-				start_iteration(deviceState, next_iteration);
-
-			} else {
-
-				handler_log(2, "Traversal completed");
-
-				uint32_t final_iteration = deviceState->iteration;
-
-				uint32_t total_nodes = 0;
-
-				for (uint32_t i=0; i < final_iteration; i++) {
-					uint32_t discovered_i = deviceState->discovered_counts[i];
-					handler_log(2, "Discovered at iteration %d = %d nodes", i, discovered_i);
-					total_nodes += discovered_i;
-				}
-
-				handler_log(2, "Total discovered = %d nodes", total_nodes);
-				handler_log(1, "Finished operation (%d)", deviceState->operation_counter);
-				next_operation(deviceState, deviceProperties);
-			}
+			finished_iteration_cb(deviceState, deviceProperties, discovered);
 
 		} else {
 
@@ -72,9 +39,15 @@ void receive_ack_traversal(
 			outgoing.dst = parent;
 			outgoing.callback = callback;
 			outgoing.discovered = discovered;
+			outgoing.visitor_id = message->visitor_id;
 
-			if (discovered)
+			if ((message->visitor_id == 1) && (parent == deviceState->parent)) {
+				// handler_log(1, "Sending ack to %d (deviceState->parent = %d)", parent, deviceState->parent);
 				reverse_visitor(deviceState, deviceProperties, discovered);
+			}
+
+			if (message->visitor_id == 0 && (discovered >= deviceState->nchildren))
+				deviceState->nchildren = discovered;
 
 			send_ack(deviceState, &outgoing);
 		}
@@ -82,4 +55,3 @@ void receive_ack_traversal(
 	}
 
 }
-

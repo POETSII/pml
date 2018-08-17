@@ -1,6 +1,6 @@
 // traversal
 //
-// Base layer in the POETS network application stack
+// Base layer in the POETS networks application stack
 //
 // This layer provides a visitor-style programming model enabling top layers
 // to express algorithms without getting into the details of network traversal.

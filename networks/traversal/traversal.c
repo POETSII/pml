@@ -27,7 +27,7 @@ int create_request(network_node_state_t *deviceState, uint32_t requester, uint32
 	return req_ind; // return request index (non-negative return value indicates success)
 }
 
-bool start_iteration(network_node_state_t *deviceState, uint32_t iteration) {
+void start_iteration(network_node_state_t *deviceState, uint32_t iteration, uint16_t visitor_id) {
 
 	// clear hoplimit
 
@@ -53,7 +53,8 @@ bool start_iteration(network_node_state_t *deviceState, uint32_t iteration) {
 	outgoing.iteration = iteration;
 	outgoing.callback = 0; // index of root request object in requests table
 	outgoing.hoplimit = iteration - 1;
-	outgoing.operation = deviceState->operation_counter;
+	outgoing.op_id = deviceState->operation_counter;
+	outgoing.visitor_id = visitor_id;
 
 	send_req(deviceState, &outgoing);
 
@@ -62,8 +63,45 @@ bool start_iteration(network_node_state_t *deviceState, uint32_t iteration) {
 	deviceState->hoplimits[iteration] = iteration;
 
 	deviceState->iteration = iteration;
+}
 
-	return true; // success
+void finished_iteration_cb(network_node_state_t *deviceState, const network_node_properties_t* deviceProperties, int32_t discovered) {
+
+	deviceState->discovered_counts[deviceState->iteration] = discovered;
+
+	handler_log(2, "Iteration %d completed (total discovered = %d)", deviceState->iteration, discovered);
+
+	bool cont = discovered > 0; // continue if non-zero nodes have been discovered
+
+	if (cont) {
+
+		uint32_t next_iteration = deviceState->iteration + 1;
+		uint32_t is_last_iteration = deviceState->iteration == deviceState->diameter;
+		uint16_t visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
+
+		handler_log(1, "Start iteration %d", next_iteration);
+		start_iteration(deviceState, next_iteration, visitor_id);
+
+	} else {
+
+		handler_log(2, "Traversal completed");
+
+		deviceState->diameter = deviceState->iteration - 1;
+
+		uint32_t final_iteration = deviceState->iteration;
+		uint32_t total_nodes = 0;
+
+		for (uint32_t i=0; i < final_iteration; i++) {
+			uint32_t discovered_i = deviceState->discovered_counts[i];
+			handler_log(2, "Discovered at iteration %d = %d nodes", i, discovered_i);
+			total_nodes += discovered_i;
+		}
+
+		handler_log(2, "Total discovered = %d nodes", total_nodes);
+		handler_log(1, "Finished operation (%d)", deviceState->operation_counter);
+		next_operation(deviceState, deviceProperties);
+	}
+
 }
 
 void soft_clear_state(network_node_state_t* deviceState, const network_node_properties_t* deviceProperties) {

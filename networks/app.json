@@ -22,9 +22,17 @@
                     "type": "uint16_t",
                     "doc": "How many further steps to propagate request"
                 },
-                "operation": {
+                "op_id": {
                     "type": "uint16_t",
-                    "doc": "Unique traversal operation identifier"
+                    "doc": "Traversal operation identifier"
+                },
+                "visitor_id": {
+                    "type": "uint16_t",
+                    "doc": "Visitor function identifier"
+                },
+                "discover": {
+                    "type": "uint16_t",
+                    "doc": "Instruct node to memorize parent and nchildren"
                 }
             }
         },
@@ -38,15 +46,16 @@
                 "discovered": {
                     "type": "int16_t",
                     "doc": "How many new nodes have been discovered"
+                },
+                "visitor_id": {
+                    "type": "uint16_t",
+                    "doc": "Visitor function identifier"
                 }
             }
         }
     },
     "device": {
         "name": "node",
-        "properties": {
-            "popvector": {}
-        },
         "state": {
             "req_counter": {},
             "hoplimits": {
@@ -80,7 +89,20 @@
             },
             "iteration": {},
             "operation_counter": {},
-            "last_operation": {}
+            "last_operation": {},
+            "parent": {
+                "doc": "Identity of parent node"
+            },
+            "nchildren": {
+                "doc": "Number of child nodes"
+            },
+            "diameter": {
+                "doc": "Network diameter"
+            },
+            "visitor_id": {
+                "type": "uint16_t",
+                "doc": "Type of current traversal operation"
+            }
         }
     }
 }

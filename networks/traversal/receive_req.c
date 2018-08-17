@@ -9,7 +9,7 @@ void receive_req_traversal(
 		message->iteration,
 		message->hoplimit);
 
-	if (message->operation != deviceState->last_operation) {
+	if (message->op_id != deviceState->last_operation) {
 
 	    // This message marks the beginning of a new operation. Perform a (soft)
 	    // clear of device state.
@@ -19,7 +19,7 @@ void receive_req_traversal(
 		if (deviceProperties->id != 0)
 			soft_clear_state(deviceState, deviceProperties);
 
-		deviceState->last_operation = message->operation;
+		deviceState->last_operation = message->op_id;
 
 	}
 
@@ -51,9 +51,20 @@ void receive_req_traversal(
 	    outgoing.iteration = message->iteration;
 	    outgoing.callback = req_ind;
 	    outgoing.hoplimit = message->hoplimit - 1;
-	    outgoing.operation = message->operation;
+	    outgoing.op_id = message->op_id;
+	    outgoing.visitor_id = message->visitor_id;
 
 	    send_req(deviceState, &outgoing);
+
+	    // 3. Update parent
+
+	    if (outgoing.visitor_id == 0)
+	        deviceState->parent = message->src;
+
+	    // 4. Call forward visitor
+
+	    if ((message->visitor_id == 1) && message->src == deviceState->parent)
+	        forward_visitor(deviceState, deviceProperties, deviceState->distance);
 
 	    // Finally, update hoplimits table
 
@@ -74,7 +85,6 @@ void receive_req_traversal(
 		if (distance_unset) {
 			deviceState->distance = message->iteration;
 			handler_log(3, "I am at distance %d from center (%d)", deviceState->distance, deviceProperties->id);
-			forward_visitor(deviceState, deviceProperties, deviceState->distance);
 		}
 
 		ack_msg outgoing;
@@ -82,9 +92,10 @@ void receive_req_traversal(
 		outgoing.dst = message->src;
 		outgoing.callback = message->callback;
 		outgoing.discovered = distance_unset ? 1 : 0;
+	    outgoing.visitor_id = message->visitor_id;
 
-		if (outgoing.discovered)
-			reverse_visitor(deviceState, deviceProperties, outgoing.discovered);
+		// if (outgoing.discovered && message->op_type == 1)
+		// 	reverse_visitor(deviceState, deviceProperties, outgoing.discovered);
 
 		send_ack(deviceState, &outgoing);
 
