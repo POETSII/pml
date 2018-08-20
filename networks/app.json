@@ -50,6 +50,9 @@
                 "visitor_id": {
                     "type": "uint16_t",
                     "doc": "Visitor function identifier"
+                },
+                "is_parent": {
+                    "doc": "Flag to indicate requesting node is sending node's parent"
                 }
             }
         }
