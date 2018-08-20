@@ -9,7 +9,9 @@
                 "matmul",
                 "xml",
                 "graphml",
-                "scripts"
+                "scripts",
+                "doc",
+                "tmp"
             ],
             "file_exclude_patterns": []
         }

@@ -53,6 +53,9 @@
                 },
                 "is_parent": {
                     "doc": "Flag to indicate requesting node is sending node's parent"
+                },
+                "payload": {
+                    "doc": "General storage element for map-reduce computations"
                 }
             }
         }
@@ -98,6 +101,9 @@
             },
             "nchildren": {
                 "doc": "Number of child nodes"
+            },
+            "ndescendants": {
+                "doc": "Number of descendent nodes"
             },
             "diameter": {
                 "doc": "Network diameter"
