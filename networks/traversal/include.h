@@ -7,9 +7,13 @@
 //
 // The following functions must be supplied by top layers:
 
-void next_operation(network_node_state_t*, const network_node_properties_t*);
-void reverse_visitor(network_node_state_t*, const network_node_properties_t*, int);
-void forward_visitor(network_node_state_t*, const network_node_properties_t*, int);
+#define STATE_PROP_ARGS network_node_state_t* deviceState, const network_node_properties_t* deviceProperties
+
+void next_operation(STATE_PROP_ARGS);
+
+void visit(STATE_PROP_ARGS, req_msg* outgoing);
+void map(STATE_PROP_ARGS, ack_msg* outgoing);
+void reduce(STATE_PROP_ARGS, const network_ack_message_t* message);
 
 // Layer implementation:
 

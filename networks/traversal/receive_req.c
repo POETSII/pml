@@ -1,8 +1,4 @@
-void receive_req_traversal(
-        network_node_state_t* deviceState,
-        const network_node_properties_t* deviceProperties,
-        const network_req_message_t* message
-    ) {
+void receive_req_traversal(STATE_PROP_ARGS, const network_req_message_t* message) {
 
     handler_log(3, "received msg from %d, iteration = %d, hoplimit = %d",
         message->src,
@@ -61,10 +57,10 @@ void receive_req_traversal(
         if (outgoing.visitor_id == 0)
             deviceState->parent = message->src;
 
-        // 4. Call forward visitor
+        // 4. Call visit
 
-        if ((message->visitor_id == 1) && message->src == deviceState->parent)
-            forward_visitor(deviceState, deviceProperties, deviceState->distance);
+        if (message->visitor_id && message->src == deviceState->parent)
+            visit(deviceState, deviceProperties, &outgoing);
 
         // Finally, update hoplimits table
 

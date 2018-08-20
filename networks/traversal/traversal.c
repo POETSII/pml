@@ -27,7 +27,7 @@ int create_request(network_node_state_t *deviceState, uint32_t requester, uint32
     return req_ind; // return request index (non-negative return value indicates success)
 }
 
-void start_iteration(network_node_state_t *deviceState, uint32_t iteration, uint16_t visitor_id) {
+void start_iteration(STATE_PROP_ARGS, uint32_t iteration, uint16_t visitor_id) {
 
     // clear hoplimit
 
@@ -47,6 +47,9 @@ void start_iteration(network_node_state_t *deviceState, uint32_t iteration, uint
 
     // Now broadcast a request to neighbours
 
+    uint32_t is_last_iteration = deviceState->iteration == deviceState->diameter;
+    uint16_t passed_visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
+
     req_msg outgoing;
 
     outgoing.dst = 0xFFFFFFFF; // broadcast
@@ -54,18 +57,20 @@ void start_iteration(network_node_state_t *deviceState, uint32_t iteration, uint
     outgoing.callback = 0; // index of root request object in requests table
     outgoing.hoplimit = iteration - 1;
     outgoing.op_id = deviceState->operation_counter;
-    outgoing.visitor_id = visitor_id;
+    outgoing.visitor_id = passed_visitor_id;
+
+    if (passed_visitor_id)
+        visit(deviceState, deviceProperties, &outgoing);
 
     send_req(deviceState, &outgoing);
 
     // Set hoplimit of this iteration manually
 
     deviceState->hoplimits[iteration] = iteration;
-
     deviceState->iteration = iteration;
 }
 
-void finished_iteration_cb(network_node_state_t *deviceState, const network_node_properties_t* deviceProperties, int32_t discovered) {
+void finished_iteration_cb(STATE_PROP_ARGS, int32_t discovered) {
 
     deviceState->discovered_counts[deviceState->iteration] = discovered;
 
@@ -73,14 +78,14 @@ void finished_iteration_cb(network_node_state_t *deviceState, const network_node
 
     bool cont = discovered > 0; // continue if non-zero nodes have been discovered
 
+    uint32_t is_last_iteration = deviceState->iteration == deviceState->diameter;
+    uint16_t visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
+
     if (cont) {
 
         uint32_t next_iteration = deviceState->iteration + 1;
-        uint32_t is_last_iteration = deviceState->iteration == deviceState->diameter;
-        uint16_t visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
-
         handler_log(1, "Start iteration %d", next_iteration);
-        start_iteration(deviceState, next_iteration, visitor_id);
+        start_iteration(deviceState, deviceProperties, next_iteration, visitor_id);
 
     } else {
 
@@ -123,10 +128,6 @@ void soft_clear_state(network_node_state_t* deviceState, const network_node_prop
 
     const uint32_t UNSET_DISTANCE = 0xFFFFFFFF;
 
-    if (is_center_node(deviceProperties)) {
-        deviceState->distance = 0;
-    } else {
-        deviceState->distance = UNSET_DISTANCE;
-    }
+    deviceState->distance = is_center_node(deviceProperties) ? 0 : UNSET_DISTANCE;
 
 }

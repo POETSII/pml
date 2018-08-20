@@ -2,23 +2,30 @@ void finish(STATE_PROP_ARGS) {
     handler_exit(0);
 }
 
-void test(STATE_PROP_ARGS) {
-    handler_log(1, "Running visitors ...");
-    uint16_t op_type = 1;
-    forward_traverse(deviceState, deviceProperties, finish, op_type);
+void test2(STATE_PROP_ARGS) {
+    uint16_t visitor_id = 8;
+    forward_traverse(deviceState, deviceProperties, finish, visitor_id);
+}
+
+void test1(STATE_PROP_ARGS) {
+    uint16_t visitor_id = 5;
+    forward_traverse(deviceState, deviceProperties, test2, visitor_id);
 }
 
 void start(STATE_PROP_ARGS) {
-
     handler_log(1, "Discovering parents and children ...");
-    uint16_t op_type = 0;
-    forward_traverse(deviceState, deviceProperties, test, op_type);
+    uint16_t visitor_id = 0;
+    forward_traverse(deviceState, deviceProperties, test1, visitor_id);
 }
 
-void forward_visitor(STATE_PROP_ARGS, int distance) {
-    handler_log(1, "Forward visitor");
+void visit(STATE_PROP_ARGS, req_msg* outgoing) {
+    handler_log(1, "Visit (visitor_id = %d)", outgoing->visitor_id);
 }
 
-void reverse_visitor(STATE_PROP_ARGS, int discovered) {
-    handler_log(1, "Reverse visitor");
+void map(STATE_PROP_ARGS, ack_msg* outgoing){
+    handler_log(1, "Map (visitor_id = %d)", outgoing->visitor_id);
+}
+
+void reduce(STATE_PROP_ARGS, const network_ack_message_t* message) {
+    handler_log(1, "Reduce msg from %d (visitor_id = %d)", message->src, message->visitor_id);
 }
