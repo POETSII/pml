@@ -29,10 +29,6 @@
                 "visitor_id": {
                     "type": "uint16_t",
                     "doc": "Visitor function identifier"
-                },
-                "discover": {
-                    "type": "uint16_t",
-                    "doc": "Instruct node to memorize parent and nchildren"
                 }
             }
         },
@@ -52,9 +48,11 @@
                     "doc": "Visitor function identifier"
                 },
                 "is_parent": {
+                    "type": "uint16_t",
                     "doc": "Flag to indicate requesting node is sending node's parent"
                 },
                 "payload": {
+                    "type": "uint16_t",
                     "doc": "General storage element for map-reduce computations"
                 }
             }
@@ -111,6 +109,9 @@
             "visitor_id": {
                 "type": "uint16_t",
                 "doc": "Type of current traversal operation"
+            },
+            "operation_index": {
+                "doc": "Index of current visit-map-reduce operation"
             }
         }
     }

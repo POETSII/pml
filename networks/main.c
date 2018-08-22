@@ -1,21 +1,31 @@
-void finish(STATE_PROP_ARGS) {
-    handler_exit(0);
-}
+void root(STATE_PROP_ARGS) {
 
-void test2(STATE_PROP_ARGS) {
-    uint16_t visitor_id = 8;
-    forward_traverse(deviceState, deviceProperties, finish, visitor_id);
-}
+    const uint16_t UNINITIALIZED = 0;
+    const uint16_t DISCOVER_VISITOR_ID = 0;
+    const uint16_t OP1_VISITOR_ID = 5;
+    const uint16_t OP2_VISITOR_ID = 8;
 
-void test1(STATE_PROP_ARGS) {
-    uint16_t visitor_id = 5;
-    forward_traverse(deviceState, deviceProperties, test2, visitor_id);
-}
+    if (deviceState->last_operation == 0) {
 
-void start(STATE_PROP_ARGS) {
-    handler_log(1, "Discovering parents and children ...");
-    uint16_t visitor_id = 0;
-    forward_traverse(deviceState, deviceProperties, test1, visitor_id);
+        handler_log(1, "Discovering parents and children ...");
+        begin(deviceState, deviceProperties, DISCOVER_VISITOR_ID);
+
+    } else if (deviceState->visitor_id == DISCOVER_VISITOR_ID) {
+
+        handler_log(1, "Running visitor 5 ...");
+        begin(deviceState, deviceProperties, OP1_VISITOR_ID);
+
+    } else if (deviceState->visitor_id == OP1_VISITOR_ID) {
+
+        handler_log(1, "Running visitor 8 ...");
+        begin(deviceState, deviceProperties, OP2_VISITOR_ID);
+
+    } else {
+
+        handler_exit(0);
+
+    }
+
 }
 
 void visit(STATE_PROP_ARGS, req_msg* outgoing) {

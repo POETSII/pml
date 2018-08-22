@@ -1,3 +1,7 @@
+// traversal
+//
+// POETS middleware to perform MapReduce-style computations on networks
+
 bool is_center_node(const network_node_properties_t* deviceProperties) {
 
     return deviceProperties->id == 0;
@@ -27,7 +31,7 @@ int create_request(network_node_state_t *deviceState, uint32_t requester, uint32
     return req_ind; // return request index (non-negative return value indicates success)
 }
 
-void start_iteration(STATE_PROP_ARGS, uint32_t iteration, uint16_t visitor_id) {
+void start_iteration(STATE_PROP_ARGS, uint32_t iteration) {
 
     // clear hoplimit
 
@@ -78,14 +82,11 @@ void finished_iteration_cb(STATE_PROP_ARGS, int32_t discovered) {
 
     bool cont = discovered > 0; // continue if non-zero nodes have been discovered
 
-    uint32_t is_last_iteration = deviceState->iteration == deviceState->diameter;
-    uint16_t visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
-
     if (cont) {
 
         uint32_t next_iteration = deviceState->iteration + 1;
         handler_log(1, "Start iteration %d", next_iteration);
-        start_iteration(deviceState, deviceProperties, next_iteration, visitor_id);
+        start_iteration(deviceState, deviceProperties, next_iteration);
 
     } else {
 
@@ -104,12 +105,12 @@ void finished_iteration_cb(STATE_PROP_ARGS, int32_t discovered) {
 
         handler_log(2, "Total discovered = %d nodes", total_nodes);
         handler_log(1, "Finished operation (%d)", deviceState->operation_counter);
-        next_operation(deviceState, deviceProperties);
+        root(deviceState, deviceProperties);
     }
 
 }
 
-void soft_clear_state(network_node_state_t* deviceState, const network_node_properties_t* deviceProperties) {
+void soft_clear_state(STATE_PROP_ARGS) {
 
     deviceState->req_counter = 0;
 
@@ -130,4 +131,15 @@ void soft_clear_state(network_node_state_t* deviceState, const network_node_prop
 
     deviceState->distance = is_center_node(deviceProperties) ? 0 : UNSET_DISTANCE;
 
+}
+
+void begin(STATE_PROP_ARGS, uint16_t visitor_id) {
+    (deviceState->operation_counter)++;
+    deviceState->visitor_id = visitor_id;
+    soft_clear_state(deviceState, deviceProperties);
+
+    deviceState->discovered_counts[0] = 1; // just center node is at distance 0
+    deviceState->visitor_id = visitor_id;
+    handler_log(2, "Start traversal");
+    start_iteration(deviceState, deviceProperties, 1);
 }

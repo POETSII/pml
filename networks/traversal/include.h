@@ -9,8 +9,7 @@
 
 #define STATE_PROP_ARGS network_node_state_t* deviceState, const network_node_properties_t* deviceProperties
 
-void next_operation(STATE_PROP_ARGS);
-
+void root(STATE_PROP_ARGS);
 void visit(STATE_PROP_ARGS, req_msg* outgoing);
 void map(STATE_PROP_ARGS, ack_msg* outgoing);
 void reduce(STATE_PROP_ARGS, const network_ack_message_t* message);
