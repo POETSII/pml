@@ -27,7 +27,6 @@
                     "doc": "Traversal operation identifier"
                 },
                 "visitor_id": {
-                    "type": "uint16_t",
                     "doc": "Visitor function identifier"
                 }
             }
@@ -44,7 +43,6 @@
                     "doc": "How many new nodes have been discovered"
                 },
                 "visitor_id": {
-                    "type": "uint16_t",
                     "doc": "Visitor function identifier"
                 },
                 "is_parent": {

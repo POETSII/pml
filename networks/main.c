@@ -1,9 +1,9 @@
 void root(STATE_PROP_ARGS) {
 
-    const uint16_t UNINITIALIZED = 0;
-    const uint16_t DISCOVER_VISITOR_ID = 0;
-    const uint16_t OP1_VISITOR_ID = 5;
-    const uint16_t OP2_VISITOR_ID = 8;
+    const uint32_t UNINITIALIZED = 0;
+    const uint32_t DISCOVER_VISITOR_ID = 0;
+    const uint32_t OP1_VISITOR_ID = 5;
+    const uint32_t OP2_VISITOR_ID = 8;
 
     if (deviceState->last_operation == 0) {
 

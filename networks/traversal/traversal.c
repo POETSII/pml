@@ -52,7 +52,7 @@ void start_iteration(STATE_PROP_ARGS, uint32_t iteration) {
     // Now broadcast a request to neighbours
 
     uint32_t is_last_iteration = deviceState->iteration == deviceState->diameter;
-    uint16_t passed_visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
+    uint32_t passed_visitor_id = is_last_iteration ? deviceState->visitor_id : 0;
 
     req_msg outgoing;
 
@@ -85,7 +85,7 @@ void finished_iteration_cb(STATE_PROP_ARGS, int32_t discovered) {
     if (cont) {
 
         uint32_t next_iteration = deviceState->iteration + 1;
-        handler_log(1, "Start iteration %d", next_iteration);
+        handler_log(1, "Start iteration %d (visitor_id = %d)", next_iteration, deviceState->visitor_id);
         start_iteration(deviceState, deviceProperties, next_iteration);
 
     } else {
@@ -133,13 +133,13 @@ void soft_clear_state(STATE_PROP_ARGS) {
 
 }
 
-void begin(STATE_PROP_ARGS, uint16_t visitor_id) {
+void begin(STATE_PROP_ARGS, uint32_t visitor_id) {
     (deviceState->operation_counter)++;
     deviceState->visitor_id = visitor_id;
     soft_clear_state(deviceState, deviceProperties);
 
     deviceState->discovered_counts[0] = 1; // just center node is at distance 0
     deviceState->visitor_id = visitor_id;
-    handler_log(2, "Start traversal");
+    handler_log(1, "Start traversal (visitor = %d)", deviceState->visitor_id);
     start_iteration(deviceState, deviceProperties, 1);
 }
