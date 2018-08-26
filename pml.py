@@ -82,7 +82,7 @@ def build(app_file, graphml_file, props_file, params=dict()):
         return json.dumps(json)[1:-1]
 
     content['params'] = params
-    content['props'] = read_json(props_file)
+    content['props'] = read_json(props_file) if props_file else {}
     graph = Graph(graphml_file)
     template = 'templates/%s/template.xml' % content["model"]
     env_globals = {
