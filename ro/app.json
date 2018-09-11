@@ -11,8 +11,7 @@
         "name": "node",
         "state": {
             "counter": {},
-            "state": {},
-            "dummy": {}
+            "state": {}
         }
     }
 }

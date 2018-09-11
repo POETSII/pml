@@ -1,6 +1,4 @@
-(deviceState->counter)++;
-
-bool finished = deviceState->counter > 10;
+bool finished = deviceState->counter >= 10;
 
 if (finished) {
 
@@ -8,7 +6,7 @@ if (finished) {
 
 } else {
 
-	handler_log(2, "counter = %d", deviceState->counter);
+	handler_log(2, "counter = %d", ++(deviceState->counter));
 
 	// toggle state:
 	deviceState->state = 1 - deviceState->state;
