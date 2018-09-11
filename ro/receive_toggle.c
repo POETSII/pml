@@ -6,7 +6,7 @@ if (finished) {
 
 } else {
 
-	handler_log(2, "counter = %d", ++(deviceState->counter));
+	handler_log(1, "counter = %d", ++(deviceState->counter));
 
 	// toggle state:
 	deviceState->state = 1 - deviceState->state;
