@@ -1,5 +1,6 @@
-import jinja2
 import os
+import sys
+import jinja2
 
 def load_text(file):
     with open(file, "r") as fid:
@@ -47,8 +48,7 @@ def generate_xml(template, graph, env_globals=dict(), content=dict()):
         """Include file in jinja template."""
 
         # Determine absolute path of included file
-        full_file = get_path(file, template) if is_file else file
-
+        full_file = get_path(file, template)
         # Create 'inner_content', a copy of 'content' merged with the named
         # arguments of 'include'.
         inner_content = join_dicts(content, kwargs)
@@ -57,7 +57,7 @@ def generate_xml(template, graph, env_globals=dict(), content=dict()):
         return generate_xml(full_file, graph, env_globals, inner_content)
 
     # Prepare jinja environment
-    loader = jinja2.PackageLoader(__name__, '')
+    loader = jinja2.FileSystemLoader([get_mod_dir(), os.getcwd()])
     env = jinja2.Environment(loader=loader)
     env.line_statement_prefix = '@'
     env.globals['include'] = include_template_file
@@ -76,3 +76,11 @@ def join_dicts(*dicts):
         result = dict(result, **d)
 
     return result
+
+
+def get_mod_dir():
+    """Return parent directory of this Python module."""
+
+    module_file = sys.modules[__name__].__file__
+    mod_dir, _ = os.path.split(module_file)
+    return mod_dir
