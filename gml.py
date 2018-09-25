@@ -193,7 +193,7 @@ def generate_hypercube(sides, fold=False):
         """
         subs = ind2sub(ind)
         parts = map(str, subs)
-        name = "n" + "-".join(parts)
+        name = "n" + "_".join(parts)
         return name
 
     node_map = {ind: get_node_name(ind) for ind in range(n)}
