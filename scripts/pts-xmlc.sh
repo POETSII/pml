@@ -7,9 +7,9 @@ PATH=$PATH:~/poets-ecosystem/
 PATH=$PATH:~/poets-ecosystem/pts-serve/
 PATH=$PATH:/local/ecad/altera/17.0/quartus/bin
 
-pts-xmlc output.xml \
+ timeout 3600 pts-xmlc output.xml \
 	--vcode=code.v \
 	--vdata=data.v \
 	-o net.elf \
-	--hardware-handler-log-level=0 \
+	--hardware-handler-log-level=2 \
 	> /dev/null
