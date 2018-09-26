@@ -1,24 +1,21 @@
 void root(STATE_PROP_ARGS) {
 
-    const uint32_t UNINITIALIZED = 0;
     const uint32_t DISCOVER_VISITOR_ID = 0;
-    const uint32_t OP1_VISITOR_ID = 5;
-    const uint32_t OP2_VISITOR_ID = 8;
+    const uint32_t nrounds = {{ params.get("nrounds", 2) }};
+
+    handler_log(1, "This is root");
 
     if (deviceState->last_operation == 0) {
 
+        deviceState->visitor_id = 0;
         handler_log(1, "Discovering parents and children ...");
         begin(deviceState, deviceProperties, DISCOVER_VISITOR_ID);
 
-    } else if (deviceState->visitor_id == DISCOVER_VISITOR_ID) {
+    } else if (deviceState->visitor_id < nrounds - 1) {
 
-        handler_log(1, "Running visitor 5 ...");
-        begin(deviceState, deviceProperties, OP1_VISITOR_ID);
-
-    } else if (deviceState->visitor_id == OP1_VISITOR_ID) {
-
-        handler_log(1, "Running visitor 8 ...");
-        begin(deviceState, deviceProperties, OP2_VISITOR_ID);
+        uint32_t next_visitor = deviceState->visitor_id + 1;
+        handler_log(1, "Running visitor %d ...", next_visitor);
+        begin(deviceState, deviceProperties, next_visitor);
 
     } else {
 
