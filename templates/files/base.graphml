@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
      http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
   <graph id="{{ instance }}" edgedefault="{{ 'directed' if directed else 'undirected' }}">
-    {%- for node in graph.nodes %}
+    {%- for node in graph.nodes | sort %}
     <node id="{{ node }}"/>
     {%- endfor %}
     {%- for src, dst in graph.get_edge_list() %}

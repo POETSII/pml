@@ -121,7 +121,7 @@ class Graph():
 
         new_edge_list = map(rename_edge, self.get_edge_list())
 
-        self.nodes = sorted(name_map.values())
+        self.nodes = name_map.values()
         self.set_edge_list(new_edge_list)
 
     def rename_nodes(self, name_format="n%d"):
