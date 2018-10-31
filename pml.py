@@ -3,11 +3,14 @@
 import os
 import json
 
+from files import read_file
+from files import read_json
 from graph import Graph
 from docopt import docopt
 from pretty import prettify_xml
 from generator import generate_xml
 from generator import get_path
+
 
 usage = """pml v0.1
 
@@ -22,24 +25,17 @@ Options:
 """
 
 
-def read_json(file):
-    """Read a JSON file."""
-    with open(file, "r") as fid:
-        return json.load(fid)
-
-
-def build(app_file, graphml_file, props_file, params=dict()):
+def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
     """Generate a POETS XML file.
 
     Args:
         app_file (str): Path to application JSON file.
-        graphml_file (str): Path to GraphML file.
-        props_file (str): Path to properties file (optional).
+        graphml (str): Content of a GraphML file.
+        props (dict): Application properties (optional).
         params (dict): Generation parameters (optional).
 
     Returns:
         str: XML file content.
-
     """
 
     content = read_json(app_file)
@@ -53,7 +49,6 @@ def build(app_file, graphml_file, props_file, params=dict()):
 
         Returns:
             str: content of file.
-
         """
         full_file = get_path(file, app_file)
         exists = os.path.isfile(full_file)
@@ -82,16 +77,17 @@ def build(app_file, graphml_file, props_file, params=dict()):
         return json.dumps(json)[1:-1]
 
     content['params'] = params
-    content['props'] = read_json(props_file) if props_file else {}
-    graph = Graph(graphml_file)
+    content['props'] = props
+    graph = Graph(graphml)
     template = 'templates/%s/template.xml' % content["model"]
     env_globals = {
         'include_app': include_app_file,
         'get_field_length': get_field_length,
         'get_props_string': get_props_string
     }
+
     xml = generate_xml(template, graph, env_globals, content)
-    return xml
+    return prettify_xml(xml) if prettify else xml
 
 
 def parse_params(param_str):
@@ -104,7 +100,6 @@ def parse_params(param_str):
 
     Returns:
       dict: dictionary of parameters
-
     """
 
     param_list = [item for item in param_str.split(",") if item]
@@ -116,14 +111,17 @@ def parse_params(param_str):
 
     return {name: value for name, value in map(split_param, param_list)}
 
+
 def main():
     args = docopt(usage, version="pml v0.1")
-    app_file = args["<app.json>"]
-    props_file = args["--props"]
-    graphml_file = args["<file.graphml>"]
-    params = parse_params(args["--param"] or "")
-    xml = build(app_file, graphml_file, props_file, params)
-    print prettify_xml(xml) if args["--pretty"] else xml
+    xml = pml(
+        app_file=args["<app.json>"],
+        graphml=read_file(args["<file.graphml>"]),
+        props=read_json(args["--props"]) if args["--props"] else {},
+        params=parse_params(args["--param"] or ""),
+        prettify=args["--pretty"]
+    )
+    print xml
 
 
 if __name__ == "__main__":

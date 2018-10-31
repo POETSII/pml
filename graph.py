@@ -11,7 +11,7 @@ class Graph():
             g = Graph(nodes, edges)
 
         where:
-            graphml_file (str): path to source GraphML file.
+            graphml (str): content of a GraphML file.
             nodes (list): list of node objects.
             edges (list): list of edges, each as (node, node).
 
@@ -37,15 +37,15 @@ class Graph():
         if type(edges) is list: self.set_edge_list(edges)
         else: self.edges = edges
 
-    def _load_graphml(self, graphml_file):
-        """Load nodes and edges from a GraphML file.
+    def _load_graphml(self, graphml):
+        """Load nodes and edges from a GraphML description.
 
         Args:
-            graphml_file (str): Path to file.
+            graphml (str): content of a GraphML file.
 
         """
-
-        root = ET.parse(graphml_file).getroot()[0]
+        tree = ET.ElementTree(ET.fromstring(graphml))
+        root = tree.getroot()[0]
         namespaces = {"graphml": "http://graphml.graphdrawing.org/xmlns"}
         edge_default = root.attrib.get("edgedefault", "directed")
 
