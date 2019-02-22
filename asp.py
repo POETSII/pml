@@ -8,6 +8,7 @@ from files import read_file
 from docopt import docopt
 from random import sample
 from random import randrange
+from collections import Counter
 from multiprocessing import Pool
 
 
@@ -18,6 +19,7 @@ Usage:
   asp.py [options] apl <file.graphml>
   asp.py [options] apl enable <node_list> <file.graphml>
   asp.py [options] apl disable <node_list> <file.graphml>
+  asp.py [options] dist <file.graphml>
   asp.py [options] impact <node_count> <trials> <file.graphml>
 
 Options:
@@ -75,6 +77,16 @@ def main():
     elif args["asp"]:
 
         print calculate_asp(graph)
+
+    elif args["dist"]:
+
+        dist = calculate_dist(graph)
+
+        max_degree = max(dist)
+
+        for degree in range(max_degree):
+            count = dist[degree]
+            print "%d, %d" % (degree, count)
 
     elif args["impact"]:
 
@@ -245,6 +257,17 @@ def _calculate_asp_single_src(graph, src):
     nodes = list(graph.nodes)
     npaths = len(visited) - 1
     return sum_ / npaths
+
+
+def calculate_dist(graph):
+    """Calculate outdegree distrbution of a graph."""
+
+    def get_outdegree(node):
+        return len(graph.edges[node])
+
+    outdegrees = map(get_outdegree, graph.nodes)
+
+    return Counter(outdegrees)
 
 
 if __name__ == "__main__":
