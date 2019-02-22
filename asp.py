@@ -14,6 +14,7 @@ from multiprocessing import Pool
 usage = """asp.py
 
 Usage:
+  asp.py [options] asp <file.graphml>
   asp.py [options] apl <file.graphml>
   asp.py [options] apl enable <node_list> <file.graphml>
   asp.py [options] apl disable <node_list> <file.graphml>
@@ -70,6 +71,10 @@ def main():
             graph = graph.reduce_graph(lambda node: node in enabled)
 
         print get_apl(graph, verbose=args["--info"])
+
+    elif args["asp"]:
+
+        print calculate_asp(graph)
 
     elif args["impact"]:
 
@@ -191,6 +196,55 @@ def get_apl(graph, verbose=False):
         log("  sum of node path distances = %d" % node_plsum)
         total_pl_sum += node_plsum
     return total_pl_sum
+
+
+def mean(nums):
+    return float(sum(nums)) / len(nums)
+
+
+def calculate_asp(graph):
+    """Calculate the all-pair average shortest path of an undirected graph."""
+
+    single_src_asps = [
+        _calculate_asp_single_src(graph, src)
+        for src in list(graph.nodes)
+    ]
+
+    return mean(single_src_asps)
+
+
+def _calculate_asp_single_src(graph, src):
+    """Calculate the average shortest path (for a single src node)."""
+
+    current = {src}
+    visited = set()
+
+    sum_ = 0  # running sum of weighed distanced
+    depth = 1  # current search depth
+
+    while current:
+
+        visited |= current
+        destinations = set()
+
+        for src in current:
+            destinations |= graph.edges[src]
+
+        destinations -= visited
+
+        # Accumulate weighed distances
+        sum_ += len(destinations) * depth
+        depth += 1
+
+        current = destinations
+
+    nnodes = len(graph.nodes)
+
+    assert len(visited) == nnodes, "Graph is disconnected"
+
+    nodes = list(graph.nodes)
+    npaths = len(visited) - 1
+    return sum_ / npaths
 
 
 if __name__ == "__main__":
