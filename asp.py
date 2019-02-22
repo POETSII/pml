@@ -4,6 +4,7 @@ import os
 import json
 
 from graph import Graph
+from files import read_file
 from docopt import docopt
 from random import sample
 from random import randrange
@@ -38,7 +39,8 @@ def parse_fantasi_nodes(fantasi_nodes):
 def main():
 
     args = docopt(usage, version="asp.py v0.1")
-    graph = Graph(args["<file.graphml>"])
+    graphml = read_file(args["<file.graphml>"])
+    graph = Graph(graphml)
 
     if args["apl"]:
 
