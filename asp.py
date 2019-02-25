@@ -82,9 +82,7 @@ def main():
 
         dist = calculate_dist(graph)
 
-        max_degree = max(dist)
-
-        for degree in range(max_degree+1):
+        for degree in range(max(dist)+1):
             count = dist[degree]
             print "%d, %d" % (degree, count)
 
