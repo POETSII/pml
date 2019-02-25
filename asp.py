@@ -84,7 +84,7 @@ def main():
 
         max_degree = max(dist)
 
-        for degree in range(max_degree):
+        for degree in range(max_degree+1):
             count = dist[degree]
             print "%d, %d" % (degree, count)
 
