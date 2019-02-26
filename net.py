@@ -12,15 +12,15 @@ from collections import Counter
 from multiprocessing import Pool
 
 
-usage = """asp.py
+usage = """net.py
 
 Usage:
-  asp.py [options] asp <file.graphml>
-  asp.py [options] apl <file.graphml>
-  asp.py [options] apl enable <node_list> <file.graphml>
-  asp.py [options] apl disable <node_list> <file.graphml>
-  asp.py [options] dist <file.graphml>
-  asp.py [options] impact <node_count> <trials> <file.graphml>
+  net.py [options] asp <file.graphml>
+  net.py [options] apl <file.graphml>
+  net.py [options] apl enable <node_list> <file.graphml>
+  net.py [options] apl disable <node_list> <file.graphml>
+  net.py [options] dist <file.graphml>
+  net.py [options] impact <node_count> <trials> <file.graphml>
 
 Options:
   -i, --info         Print graph traversal information.
@@ -41,7 +41,7 @@ def parse_fantasi_nodes(fantasi_nodes):
 
 def main():
 
-    args = docopt(usage, version="asp.py v0.1")
+    args = docopt(usage, version="net.py v0.1")
     graphml = read_file(args["<file.graphml>"])
     graph = Graph(graphml)
 
