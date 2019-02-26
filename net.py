@@ -14,6 +14,8 @@ from multiprocessing import Pool
 
 usage = """net.py
 
+Swiss army knife network analysis tool
+
 Usage:
   net.py [options] asp <file.graphml>
   net.py [options] apl <file.graphml>
@@ -121,16 +123,6 @@ def main():
     else:
 
         print get_apl(graph, verbose=args["--info"])
-
-
-def read_json(file):
-    with open(file, "r") as fid:
-        return json.load(fid)
-
-
-def read_plain(file):
-    with open(file, 'r') as fid:
-        return fid.read()
 
 
 def get_impact(graph, disabled):
