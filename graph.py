@@ -1,4 +1,4 @@
-from xml.etree import ElementTree as ET
+from xml.etree import cElementTree as ET
 from collections import defaultdict
 
 
