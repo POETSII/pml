@@ -4,19 +4,25 @@ import os
 import json
 
 from graph import Graph
+from files import read_file
 from docopt import docopt
 from random import sample
 from random import randrange
+from collections import Counter
 from multiprocessing import Pool
 
 
-usage = """asp.py
+usage = """net.py
+
+Swiss army knife network analysis tool
 
 Usage:
-  asp.py [options] apl <file.graphml>
-  asp.py [options] apl enable <node_list> <file.graphml>
-  asp.py [options] apl disable <node_list> <file.graphml>
-  asp.py [options] impact <node_count> <trials> <file.graphml>
+  net.py [options] asp <file.graphml>
+  net.py [options] apl <file.graphml>
+  net.py [options] apl enable <node_list> <file.graphml>
+  net.py [options] apl disable <node_list> <file.graphml>
+  net.py [options] dist <file.graphml>
+  net.py [options] impact <node_count> <trials> <file.graphml>
 
 Options:
   -i, --info         Print graph traversal information.
@@ -37,8 +43,9 @@ def parse_fantasi_nodes(fantasi_nodes):
 
 def main():
 
-    args = docopt(usage, version="asp.py v0.1")
-    graph = Graph(args["<file.graphml>"])
+    args = docopt(usage, version="net.py v0.1")
+    graphml = read_file(args["<file.graphml>"])
+    graph = Graph(graphml)
 
     if args["apl"]:
 
@@ -68,6 +75,18 @@ def main():
             graph = graph.reduce_graph(lambda node: node in enabled)
 
         print get_apl(graph, verbose=args["--info"])
+
+    elif args["asp"]:
+
+        print calculate_asp(graph)
+
+    elif args["dist"]:
+
+        dist = calculate_dist(graph)
+
+        for degree in range(max(dist)+1):
+            count = dist[degree]
+            print "%d, %d" % (degree, count)
 
     elif args["impact"]:
 
@@ -104,16 +123,6 @@ def main():
     else:
 
         print get_apl(graph, verbose=args["--info"])
-
-
-def read_json(file):
-    with open(file, "r") as fid:
-        return json.load(fid)
-
-
-def read_plain(file):
-    with open(file, 'r') as fid:
-        return fid.read()
 
 
 def get_impact(graph, disabled):
@@ -189,6 +198,66 @@ def get_apl(graph, verbose=False):
         log("  sum of node path distances = %d" % node_plsum)
         total_pl_sum += node_plsum
     return total_pl_sum
+
+
+def mean(nums):
+    return float(sum(nums)) / len(nums)
+
+
+def calculate_asp(graph):
+    """Calculate the all-pair average shortest path of an undirected graph."""
+
+    single_src_asps = [
+        _calculate_asp_single_src(graph, src)
+        for src in list(graph.nodes)
+    ]
+
+    return mean(single_src_asps)
+
+
+def _calculate_asp_single_src(graph, src):
+    """Calculate the average shortest path (for a single src node)."""
+
+    current = {src}
+    visited = set()
+
+    sum_ = 0  # running sum of weighed distanced
+    depth = 1  # current search depth
+
+    while current:
+
+        visited |= current
+        destinations = set()
+
+        for src in current:
+            destinations |= graph.edges[src]
+
+        destinations -= visited
+
+        # Accumulate weighed distances
+        sum_ += len(destinations) * depth
+        depth += 1
+
+        current = destinations
+
+    nnodes = len(graph.nodes)
+
+    assert len(visited) == nnodes, "Graph is disconnected"
+
+    nodes = list(graph.nodes)
+    npaths = len(visited) - 1
+    return sum_ / npaths
+
+
+def calculate_dist(graph):
+    """Calculate outdegree distrbution of a graph."""
+
+    def get_outdegree(node):
+        return len(graph.edges[node])
+
+    outdegrees = map(get_outdegree, graph.nodes)
+
+    return Counter(outdegrees)
 
 
 if __name__ == "__main__":

@@ -13,6 +13,13 @@ def write_file(file, content):
         fid.write(content)
 
 
+def read_csv(file, type_=str):
+    content = read_file(file)
+    lines = content.strip().split("\n")
+    rows = [map(type_, line.split(",")) for line in lines]
+    return rows
+
+
 def write_json(obj, file):
     """Write JSON object to file."""
     with open(file, "w") as fid:
