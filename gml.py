@@ -83,7 +83,10 @@ def generate_random(nodes, edges):
 
     """
     nodes = ["n%d" % i for i in range(nodes)]
-    edge_list = sample(list(product(nodes, nodes)), edges)
+    edge_list = []
+    for _ in range(edges):
+        edge = sample(nodes, 2)
+        edge_list.append(edge)
     return Graph(nodes, edge_list)
 
 
