@@ -39,9 +39,11 @@ void map(STATE_PROP_ARGS, ack_msg* outgoing){
         outgoing->payload = deviceState->ndescendants + 1;
 }
 
+
 void reduce(STATE_PROP_ARGS, const network_ack_message_t* message) {
     handler_log(1, "Reduce msg from %d (visitor_id = %d)", message->src, message->visitor_id);
 
     if (message->visitor_id == 5)
         deviceState->ndescendants += message->payload;
 }
+
