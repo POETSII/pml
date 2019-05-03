@@ -281,15 +281,15 @@ Options:
 
 ### Ring Oscillator Example
 
-The directory [`ro`](../ro) contains an example ring oscillator `pml`
+The directory [`apps/ro`](../apps/ro) contains an example ring oscillator `pml`
 application that can be used to demo the tool. The example consists of only
 three files:
 
 File                                         | Description
 -------------------------------------------- | -----------
-[`app.json`](../ro/app.json)                 | Configuration file
-[`init.c`](../ro/init.c)                     | State initialization handler
-[`receive_toggle.c`](../ro/receive_toggle.c) | Message receive handler
+[`app.json`](../apps/ro/app.json)                 | Configuration file
+[`init.c`](../apps/ro/init.c)                     | State initialization handler
+[`receive_toggle.c`](../apps/ro/receive_toggle.c) | Message receive handler
 
 This example is based on the `simple` model and contains a single device type
 (`node`) and message type (`toggle`). During initialization, the root node (id
@@ -306,7 +306,7 @@ The following commands generate an instance of this application
 ./gml.py line --fold 10 > /tmp/chain.graphml
 
 # Combine app config with graph to generate app instance
-./pml.py ro/app.json /tmp/chain.graphml > /tmp/ro_inst.xml
+./pml.py apps/ro/app.json /tmp/chain.graphml > /tmp/ro_inst.xml
 ```
 
 Here, `gml` is used to create a line graph with 10 nodes. The `--fold` switch
