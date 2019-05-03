@@ -1,6 +1,1 @@
-*.py text
-*.xml text
-*.txt text
-*.c text
-*.h text
-* text eof=lf
+* -text
