@@ -1,4 +1,4 @@
-@ set num_tiles = params.get('tiles', 1)
+@ set num_tiles = params.get('tiles', 1) | int
 
 @ macro make_field(fd_id, fd_content)
 	@ set fd_type = fd_content.get('type', 'uint32_t')
@@ -15,6 +15,7 @@
 <?xml version="1.0"?>
 <Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
 	<GraphType id="{{ type }}">
+		<!-- {{ num_tiles }} tiles -->
 		@ if doc is defined
 		<Documentation>{{ doc }}</Documentation>
 		@ endif
