@@ -1,0 +1,62 @@
+{
+	"type": "asp",
+	"model": "tiles",
+	"constants": {
+		"ROOT_COUNT": 10
+	},
+	"properties": {
+		"rootCount": { "type": "uint32_t", "default": "ROOT_COUNT" },
+		"nodeCount": { "type": "uint32_t"}
+	},
+	"messages": {
+		"heartbeat": {
+			"src": [],
+			"dst": ["node"]
+		},
+		"update": {
+			"src": ["node"],
+			"dst": ["node"],
+			"fields": {
+				"rootIdx": { "type": "uint32_t" },
+				"hops": { "type": "uint32_t" }
+			}
+		},
+		"finished": {
+			"src": ["node"],
+			"dst": ["supervisor"],
+			"fields": {
+				"graphInst": { "type": "uint32_t" },
+				"id": { "type": "uint32_t" },
+				"fin": { "type": "uint8_t" },
+				"finIdx": { "type": "uint16_t" },
+				"avgHops": { "type": "float" }
+			}
+		}
+	},
+	"devices": {
+		"node" : {
+			"instance": "node",
+			"properties": {
+				"graphInst": { "type": "uint32_t" },
+				"id": { "type": "uint32_t" },
+				"rootIdx": { "type": "int32_t", "default": -1 }
+			},
+			"state": {
+				"fin": { "type": "uint8_t", "default": 0 },
+				"finSent": { "type": "uint8_t", "default": 0 },
+				"finIdx": { "type": "uint16_t", "default": 0 },
+				"buff": { "type": "uint32_t", "length": "ROOT_COUNT" },
+				"updated": { "type": "uint8_t", "length": "ROOT_COUNT" },
+				"updatePending": { "type": "uint32_t" }
+			}
+		},
+		"supervisor" : {
+			"instance": "supervisor",
+			"doc": "TODO: supervisor is not implemented yet",
+			"properties": {
+			},
+			"state": {
+			}
+		}
+	}
+}

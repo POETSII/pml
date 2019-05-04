@@ -56,8 +56,22 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
         elif optional: return ''
         else: raise Exception('Required file %s not found' % file)
 
+    def get_field_default(field):
+        if "default" not in field:
+            return ''
+        
+        fdef = field["default"]
+        
+        if (type(fdef) is int) or (type(fdef) is float):
+            return fdef
+        if (type(fdef) is unicode) and (fdef in params):
+            return params[fdef]
+        if (type(fdef) is unicode) and (fdef in content["constants"]):
+            return content["constants"][fdef]
+        
+        return fdef
+    
     def get_field_length(field):
-
         if "length" not in field:
             return 1  # scalar
 
@@ -83,6 +97,7 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
     env_globals = {
         'include_app': include_app_file,
         'get_field_length': get_field_length,
+        'get_field_default': get_field_default,
         'get_props_string': get_props_string
     }
 

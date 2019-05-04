@@ -1,0 +1,230 @@
+@ set num_tiles = params.get('tiles', 1)
+
+@ macro make_field(fd_id, fd_content)
+	@ set fd_type = fd_content.get('type', 'uint32_t')
+	@ set fd_length = get_field_length(fd_content)
+	@ set is_array = fd_length > 1
+	@ if is_array
+<Array name="{{ fd_id }}" type="{{ fd_type }}" length="{{ fd_length }}" />
+	@ else
+	@ set fd_def = get_field_default(fd_content)
+<Scalar name="{{ fd_id }}" type="{{ fd_type }}"{% if fd_def!='' %} default="{{ fd_def }}"{% endif %} />
+	{%- endif -%}
+@ endmacro
+
+<?xml version="1.0"?>
+<Graphs xmlns="https://poets-project.org/schemas/virtual-graph-schema-v2">
+	<GraphType id="{{ type }}">
+		@ if doc is defined
+		<Documentation>{{ doc }}</Documentation>
+		@ endif
+
+		<SharedCode><![CDATA[
+{{ include_app('shared.c', optional=True) }}
+		]]></SharedCode>
+		
+		<Properties>
+			@ for fd_id, fd_content in properties.items()
+			{{ make_field(fd_id, fd_content) }}
+			@ endfor
+		</Properties>
+		
+		<MessageTypes>
+			@ for id, content in messages.items()
+			<MessageType id="{{ id }}">
+				@ if content['doc'] is defined
+				<Documentation>{{ content['doc'] }}</Documentation>
+				@ endif
+				<Message>
+					@ set field_items = content.get('fields', {}).items()
+					@ for fd_id, fd_content in field_items
+					{{ make_field(fd_id, fd_content) }}
+					@ endfor
+				</Message>
+			</MessageType>
+			@ endfor
+		</MessageTypes>
+
+		<DeviceTypes>
+			@ for device_name, device in devices.items()
+			@ set device_inst = device.get('instance', 'node')
+			@ set is_supervisor = device_inst=='supervisor'
+			@ set device_tag = 'SupervisorDeviceType' if is_supervisor else 'DeviceType'
+			<{{ device_tag }} id="{{ device_name }}">
+				@ if device['doc'] is defined
+				<Documentation>{{ device['doc'] }}</Documentation>
+				@ endif
+				<Properties>
+					@ set property_items = device.get('properties', {}).items()
+					@ for p_id, p_content in property_items
+					{{ make_field(p_id, p_content) }}
+					@ endfor
+				</Properties>
+
+				<State>
+					@ for s_id, s_content in device['state'].items()
+					{{ make_field(s_id, s_content) }}
+					@ endfor
+				</State>
+
+				@ if is_supervisor
+				<Code><![CDATA[
+{{ include_app('%s_code.c' % device_name, optional=True) }}
+				]]></Code>
+				
+				@ else
+				<SharedCode><![CDATA[
+{{ include_app('%s_shared.c' % device_name, optional=True) }}
+				]]></SharedCode>
+
+				<ReadyToSend><![CDATA[
+{{ include_app('%s_rts.c' % device_name, optional=True) }}
+				]]></ReadyToSend>
+
+				<OnCompute><![CDATA[
+{{ include_app('%s_idle.c' % device_name, optional=True) }}
+				]]></OnCompute>
+				
+				@ endif
+
+				@ for msg, content in messages.items()
+				@ set msg_dst = content.get('dst', [])
+				@ if device_name in msg_dst
+				<InputPin messageTypeId="{{ msg }}" name="{{ msg }}_in">
+					<OnReceive><![CDATA[
+{{ include_app('%s_receive_%s.c' % (device_name, msg), optional=True) }}
+					]]></OnReceive>
+				</InputPin>
+
+				@ endif
+				@ set msg_src = content.get('src', [])
+				@ if device_name in msg_src
+				<OutputPin messageTypeId="{{ msg }}" name="{{ msg }}_out">
+					<OnSend><![CDATA[
+{{ include_app('%s_send_%s.c' % (device_name, msg), optional=True) }}
+					]]></OnSend>
+				</OutputPin>
+
+				@ endif
+				@ endfor
+			</{{ device_tag }}>
+
+			@endfor
+		</DeviceTypes>
+	</GraphType>
+	
+<GraphInstance id="{{ type }}" graphTypeId="{{ type }}">
+	<!-- TODO: graph properties -->
+	<DeviceInstances>
+		@ for device_name, device in devices.items()
+		@ set device_inst = device.get('instance', 'node')
+		@ if device_inst=='node'
+		@ for tile in range(num_tiles)
+		@ for node in graph.nodes
+		<DevI id="{{ device_name }}_{{ tile }}_{{ node }}" type="{{ device_name }}">
+			<P><!-- TODO: device properties --></P>
+		</DevI>
+		@ endfor
+		@ endfor
+		@ elif device_inst=='tile'
+		@ for tile in range(num_tiles)
+		<DevI id="{{ device_name }}_{{ tile }}" type="{{ device_name }}">
+			<P><!-- TODO: device properties --></P>
+		</DevI>
+		@ endfor
+		@ else
+		<DevI id="{{ device_name }}" type="{{ device_name }}">
+			<P><!-- TODO: device properties --></P>
+		</DevI>
+		@ endif
+		@ endfor
+	</DeviceInstances>
+	<EdgeInstances>
+		@ for msg, content in messages.items()
+		@ set msg_src = content.get('src', [])
+		@ set msg_dst = content.get('dst', [])
+		@ for src_dev in msg_src
+		@ for dst_dev in msg_dst
+		
+		<!-- {{ msg }} edges from {{src_dev}} to {{dst_dev}} devices -->
+		@ if src_dev==dst_dev
+		@ set dev_inst = devices[src_dev].get('instance', 'node')
+
+		@ if dev_inst=='node'
+		@ for tile in range(num_tiles)
+		@ for src, dst in graph.get_edge_list()
+		<EdgeI path="{{ dst_dev }}_{{ tile }}_{{ dst }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}_{{ src }}:{{ msg }}_out"/>
+		@ endfor
+		@ endfor
+		@ elif dev_inst=='tile'
+		<!-- TODO: tile-tile device topology is not supported yet -->
+		@ else
+		<!-- warning: {{ dev_inst }}-{{ dev_inst }} edges are not allowed  -->
+		@ endif
+		
+		@ else
+		@ set src_inst = devices[src_dev].get('instance', 'node')
+		@ set dst_inst = devices[dst_dev].get('instance', 'node')
+		
+		@ if (src_inst=='node') and (dst_inst=='node')
+		@ for tile in range(num_tiles)
+		@ for node in graph.nodes
+		<EdgeI path="{{ dst_dev }}_{{ tile }}_{{ node }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}_{{ node }}:{{ msg }}_out"/>
+		@ endfor
+		@ endfor
+
+		@ elif (src_inst=='node') and (dst_inst=='tile')
+		@ for tile in range(num_tiles)
+		@ for node in graph.nodes
+		<EdgeI path="{{ dst_dev }}_{{ tile }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}_{{ node }}:{{ msg }}_out"/>
+		@ endfor
+		@ endfor
+		
+		@ elif (src_inst=='node') and ((dst_inst=='unique') or (dst_inst=='supervisor'))
+		@ for tile in range(num_tiles)
+		@ for node in graph.nodes
+		<EdgeI path="{{ dst_dev }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}_{{ node }}:{{ msg }}_out"/>
+		@ endfor
+		@ endfor
+		
+		@ elif (src_inst=='tile') and (dst_inst=='node')
+		@ for tile in range(num_tiles)
+		@ for node in graph.nodes
+		<EdgeI path="{{ dst_dev }}_{{ tile }}_{{ node }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}:{{ msg }}_out"/>
+		@ endfor
+		@ endfor
+
+		@ elif (src_inst=='tile') and (dst_inst=='tile')
+		@ for tile in range(num_tiles)
+		<EdgeI path="{{ dst_dev }}_{{ tile }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}:{{ msg }}_out"/>
+		@ endfor
+		
+		@ elif (src_inst=='tile') and ((dst_inst=='unique') or (dst_inst=='supervisor'))
+		@ for tile in range(num_tiles)
+		<EdgeI path="{{ dst_dev }}:{{ msg }}_in-{{ src_dev }}_{{ tile }}:{{ msg }}_out"/>
+		@ endfor
+
+		@ elif ((src_inst=='unique') or (src_inst=='supervisor')) and (dst_inst=='node')
+		@ for tile in range(num_tiles)
+		@ for node in graph.nodes
+		<EdgeI path="{{ dst_dev }}_{{ tile }}_{{ node }}:{{ msg }}_in-{{ src_dev }}:{{ msg }}_out"/>
+		@ endfor
+		@ endfor
+
+		@ elif ((src_inst=='unique') or (src_inst=='supervisor')) and (dst_inst=='tile')
+		@ for tile in range(num_tiles)
+		<EdgeI path="{{ dst_dev }}_{{ tile }}:{{ msg }}_in-{{ src_dev }}:{{ msg }}_out"/>
+		@ endfor
+		
+		@ else
+		<EdgeI path="{{ dst_dev }}:{{ msg }}_in-{{ src_dev }}:{{ msg }}_out"/>
+		@ endif
+		
+		@ endif
+		
+		@ endfor
+		@ endfor
+		@ endfor
+	</EdgeInstances>
+</GraphInstance>
+</Graphs>
