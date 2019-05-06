@@ -116,6 +116,7 @@
 	
 <GraphInstance id="{{ type }}" graphTypeId="{{ type }}">
 	<!-- TODO: graph properties -->
+	<!-- Jinja2 loop bug https://github.com/pallets/jinja/issues/656 needs workaround! -->
 	<DeviceInstances>
 		@ for device_name, device in devices.items()
 		@ set device_inst = device.get('instance', 'node')
@@ -137,7 +138,7 @@
 			@ set p_val = call_extension(p_gen, {"tile":tile, "id":node_id, "node":node, "graph":graph, "constants":constants})
 			@ endif
 			@ if p_val!=''
-			{{ p_id }}":{{ p_val }},
+			"{{ p_id }}":{{ p_val }},
 			@ endif
 			@ endfor
 			</P>
