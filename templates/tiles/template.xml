@@ -122,8 +122,25 @@
 		@ if device_inst=='node'
 		@ for tile in range(num_tiles)
 		@ for node in graph.nodes
+		@ set node_id = loop.index0
 		<DevI id="{{ device_name }}_{{ tile }}_{{ node }}" type="{{ device_name }}">
-			<P><!-- TODO: device properties --></P>
+			<P>
+			@ set property_items = device.get('properties', {}).items()
+			@ for p_id, p_content in property_items
+			@ set p_gen = p_content.get('generator', '')
+			@ set p_val = ''
+			@ if p_gen=='id'
+			@ set p_val = node_id
+			@ elif p_gen=='tile'
+			@ set p_val = tile
+			@ elif p_gen!=''
+			@ set p_val = call_extension(p_gen, {"tile":tile, "id":node_id, "node":node, "graph":graph, "constants":constants})
+			@ endif
+			@ if p_val!=''
+			{{ p_id }}":{{ p_val }},
+			@ endif
+			@ endfor
+			</P>
 		</DevI>
 		@ endfor
 		@ endfor

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import json
 
+from importlib import import_module
 from files import read_file
 from files import read_json
 from graph import Graph
@@ -40,6 +42,18 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
 
     content = read_json(app_file)
 
+    ext_file = get_path('extensions.py', app_file)
+    ext_exists = os.path.isfile(ext_file)
+    if ext_exists:
+        sys.path.append(os.path.split(app_file)[0])
+        ext = import_module('extensions')
+
+    def call_extension(func_name, params):
+        if ext_exists and hasattr(ext, func_name):
+            func = getattr(ext, func_name)
+            return func(**params)
+        else: raise Exception('Required extension function %s not found' % func_name)
+        
     def include_app_file(file, optional=False):
         """Return content of file in app directory.
 
@@ -95,6 +109,7 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
     graph = Graph(graphml)
     template = 'templates/%s/template.xml' % content["model"]
     env_globals = {
+        'call_extension': call_extension,
         'include_app': include_app_file,
         'get_field_length': get_field_length,
         'get_field_default': get_field_default,

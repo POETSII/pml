@@ -37,9 +37,9 @@
 		"node" : {
 			"instance": "node",
 			"properties": {
-				"graphInst": { "type": "uint32_t" },
-				"id": { "type": "uint32_t" },
-				"rootIdx": { "type": "int32_t", "default": -1 }
+				"graphInst": { "type": "uint32_t", "generator": "tile" },
+				"id": { "type": "uint32_t", "generator": "id" },
+				"rootIdx": { "type": "int32_t", "default": -1, "generator": "get_root_index" }
 			},
 			"state": {
 				"fin": { "type": "uint8_t", "default": 0 },
