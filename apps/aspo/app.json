@@ -5,8 +5,9 @@
 		"ROOT_COUNT": 10
 	},
 	"properties": {
-		"rootCount": { "type": "uint32_t", "default": "ROOT_COUNT" },
-		"nodeCount": { "type": "uint32_t"}
+		"tileCount": { "type": "uint32_t", "generator": "tileCount" },
+		"nodeCount": { "type": "uint32_t", "generator": "nodeCount" },
+		"rootCount": { "type": "uint32_t", "default": "ROOT_COUNT" }
 	},
 	"messages": {
 		"heartbeat": {
