@@ -281,7 +281,7 @@ The template also provides built-in graph property generators:
 def get_leaf_nodes(graph, constants):
 	return sum(graph.get_outdegree(node)<2 for node in graph.nodes)
 
-def function_name(tile, node_id, node, graph, constants):
+def get_is_leaf(tile, node_id, node, graph, constants):
 	if graph.get_outdegree(node)<2:
 		return 1
 	else
