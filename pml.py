@@ -27,10 +27,10 @@ Options:
 """
 
 def is_str(s):
-	try:
-		return type(s) is unicode
-	except NameError:
-		return type(s) is str
+    try:
+        return type(s) is unicode
+    except NameError:
+        return type(s) is str
 
 def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
     """Generate a POETS XML file.
