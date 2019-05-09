@@ -21,6 +21,8 @@
 			@ set p_val = graph.nodes|length
 		@ elif p_gen=='tileCount'
 			@ set p_val = num_tiles
+		@ elif p_gen=='totalNodeCount'
+			@ set p_val = graph.nodes|length
 		@ elif p_gen!=''
 			@ set p_val = call_extension(p_gen, {"graph":graph, "constants":constants})
 		@ endif
@@ -45,6 +47,8 @@
 			@ set p_val = node_id
 		@ elif p_gen=='tile'
 			@ set p_val = tile
+		@ elif p_gen=='outDegree'
+			@ set p_val = graph.get_outdegree(node)
 		@ elif p_gen!=''
 			@ set p_val = call_extension(p_gen, {"tile":tile, "id":node_id, "node":node, "graph":graph, "constants":constants})
 		@ endif
