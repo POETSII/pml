@@ -255,7 +255,7 @@ def main():
     if not args["--coords"]:
         graph.rename_nodes("n%d")
 
-    print generate_xml("templates/files/base.graphml", graph, content=content)
+    print(generate_xml("templates/files/base.graphml", graph, content=content))
 
 
 if __name__ == "__main__":

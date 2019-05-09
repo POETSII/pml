@@ -16,7 +16,7 @@ def prettify_xml(xml):
         return xml
 
     if proc.returncode is not 0:
-        print err
+        print(err)
         raise Exception("xmllint returned non-zero exit code")
 
     return output

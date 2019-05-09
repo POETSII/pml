@@ -23,7 +23,7 @@ class Graph():
 
         handlers = {
             (str,): self._load_graphml,
-            (unicode,): self._load_graphml,
+            #(unicode,): self._load_graphml,
             (list, list): self._init_nodes_edges,
             (list, dict): self._init_nodes_edges,
             (list, defaultdict): self._init_nodes_edges

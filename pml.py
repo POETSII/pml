@@ -26,6 +26,11 @@ Options:
 
 """
 
+def is_str(s):
+	try:
+		return type(s) is unicode
+	except NameError:
+		return type(s) is str
 
 def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
     """Generate a POETS XML file.
@@ -64,7 +69,7 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
         Returns:
             str: content of file.
         """
-        full_file = get_path(file, app_file)
+        full_file = get_path(file, app_file).replace('\\','/')
         exists = os.path.isfile(full_file)
         if exists: return generate_xml(full_file, graph, content)
         elif optional: return ''
@@ -78,9 +83,9 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
         
         if (type(fdef) is int) or (type(fdef) is float):
             return fdef
-        if (type(fdef) is unicode) and (fdef in params):
+        if (is_str(fdef)) and (fdef in params):
             return params[fdef]
-        if (type(fdef) is unicode) and (fdef in content["constants"]):
+        if (is_str(fdef)) and (fdef in content["constants"]):
             return content["constants"][fdef]
         
         return fdef
@@ -93,9 +98,9 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
 
         if type(flen) is int:
             return flen
-        if (type(flen) is unicode) and (flen in params):
+        if (is_str(flen)) and (flen in params):
             return params[flen]
-        if (type(flen) is unicode) and (flen in content["constants"]):
+        if (is_str(flen)) and (flen in content["constants"]):
             return content["constants"][flen]
 
         raise Exception("Could not determine length of field %s" % field)
@@ -151,7 +156,7 @@ def main():
         params=parse_params(args["--param"] or ""),
         prettify=args["--pretty"]
     )
-    print xml
+    print(xml)
 
 
 if __name__ == "__main__":
