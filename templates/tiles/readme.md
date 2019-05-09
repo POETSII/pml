@@ -10,12 +10,123 @@ The number of tiles is passed as a parameter to the generator, default is 1.
 
 Additionally, the template supports multiple device types and supervisor devices.
 
-## Instantiation and topology
+## Application Structure
 
-### Device 'instance' property
+Files:
+- **app.json** contains the application definition.
+- **extensions.py** (optional) contains application-specific callback functions.
+	This template uses callback functions to [generate property values](#property-generation).
+
+**app.json** structure:
+```json
+{
+	"type": "graph_type_name",
+	"model": "tiles",
+	"constants": {
+	},
+	"properties": {
+	},
+	"messages": {
+	},
+	"devices": {
+	}
+}
+```
+
+- **type** is the name of both the graph type and the graph instance
+	as the current version supports only one graph instance per XML.
+- **model** is the application model name (`"tiles"` for this template).
+- **constants** (optional) is a dictionary of template constants that
+	can be used in **app.json** to specify default values or array lengths
+	in [field list](#field-lists) definitions.
+- **properties** (optional) is the [field list](#field-lists) of graph properties.
+- **messages** dictionary defines [message types](#messages).
+- **devices** dictionary defines [device types](#devices).
+
+### Devices
 
 The `devices` dictionary defines the set of device types where the keys are device type names.
-For instance, the following code defines device types `A`, `B`, `T`, and `S`.
+```json
+"devices": {
+	"device_type_name" : {
+		"instance": "node",
+		"doc": "device type description",
+		"properties": {
+		},
+		"state": {
+		}
+	}
+}
+```
+
+- **instance** specifies the device [instantiation](#device-instance-property) type.
+- **doc** (optional) contains a documentation string.
+- **properties** (optional) is the [field list](#field-lists) of device properties.
+- **state** is the [field list](#field-lists) definition of the device state.
+
+### Messages
+
+The `messages` dictionary defines the set of message types where the keys are message type names.
+```json
+"messages": {
+	"update": {
+		"src": ["device_type1", "device_type2"],
+		"dst": ["device_type1", "device_type2"],
+		"fields": {
+		}
+	}
+}
+```
+
+- ** src** and **dst** specify device types that can send and receive the message.
+	See [Message sources and destinations](#message-sources-and-destinations).
+- **fields** is the message [field list](#field-lists).
+
+### Field lists
+
+```json
+{
+	"field1": { "type": "uint32_t", "default": 0 },
+	"field2": { "type": "uint8_t", "length": 100 },
+	"field3": { "type": "float", "generator": "get_field3_value" }
+}
+```
+
+- **type** is the C++ type of the field.
+- **default** (optional) specifies the initial value.
+	Can also be a string referencing a member of `constants` dictionary.
+- **length** (optional) defines the array length. If length is greater than 1, an `<Array>` tag is
+	generated, otherwise a `<Scalar>` tag is produced (default behaviour).
+	Can also be a string referencing a member of `constants` dictionary.
+- **generator** (optional) specifies the name of a callback function from **extensions.py**.
+	See [Property Generators](#property_generators).
+
+> Tuples are not supported at the moment.
+
+The above example will produce:
+```xml
+<Scalar name="field1" type="uint32_t" default="0" />
+<Array name="field2" type="uint8_t" length="100" />
+<Scalar name="field3" type="float" />
+```
+
+Example of using `constants`:
+```json
+{
+	"constants": {
+		"FIELD1_INIT": 0,
+		"FIELD2_COUNT": 100
+	}
+	"properties": {
+		"field1": { "type": "uint32_t", "default": "FIELD1_INIT" },
+		"field2": { "type": "uint8_t", "length": "FIELD2_COUNT" }
+	}
+}
+```
+
+## Instantiation and Topology
+
+### Device _instance_ property
 
 ```json
 "devices": {
@@ -74,3 +185,7 @@ and message types.
 - For **node-tile** messages: connect each node in a graph tile to the respective tile-unique node.
 - For **node-unique**, **node-supervisor**, **tile-unique**, or **tile-supervisor** messages:
 	connect all instances to the unique node.
+
+## Property generators
+
+(TODO)
