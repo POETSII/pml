@@ -16,6 +16,7 @@ Files:
 - **app.json** contains the application definition.
 - **extensions.py** (optional) contains application-specific callback functions.
 	This template uses callback functions to [generate property values](#property-generation).
+- **\*.c** (optional) [C++ code](#c-code).
 
 **app.json** structure:
 ```json
@@ -116,13 +117,33 @@ Example of using `constants`:
 	"constants": {
 		"FIELD1_INIT": 0,
 		"FIELD2_COUNT": 100
-	}
+	},
 	"properties": {
 		"field1": { "type": "uint32_t", "default": "FIELD1_INIT" },
 		"field2": { "type": "uint8_t", "length": "FIELD2_COUNT" }
 	}
 }
 ```
+
+### C++ code
+
+> All C++ files are optional.
+
+- **shared.c** contains globally shared code for the `<SharedCode>` XML section.
+
+Device code:
+- **_(device\_type)_\_shared.c** contains device shared code, `<SharedCode>`.
+- **_(device\_type)_\_code.c** contains supervisor shared code, `<Code>`.
+- **_(device\_type)_\_rts.c** contains device `<ReadyToSend>` handler.
+- **_(device\_type)_\_idle.c** contains device `<OnCompute>` handler (idle).
+
+_(device\_type)_ to be replaced with the respective device type name
+
+Device pins:
+- **_(device\_type)_\_receive\__(message\_type)_.c** contains `<OnReceive>`
+	handler for the input pin of _(message\_type)_ message type.
+- **_(device\_type)_\_send\__(message\_type)_.c** contains `<OnSend>`
+	handler for the output pin of _(message\_type)_ message type.
 
 ## Instantiation and Topology
 
@@ -186,6 +207,101 @@ and message types.
 - For **node-unique**, **node-supervisor**, **tile-unique**, or **tile-supervisor** messages:
 	connect all instances to the unique node.
 
-## Property generators
+## Property Generators
 
-(TODO)
+Some property values are application-specific and can only be calculated for a given
+graph instance. This can be done using callback functions in **extentions.py**.
+
+This template supports generating graph instance properties and device instance properties.
+
+### Graph instance properties
+
+Callback function definition:
+```py
+def function_name(graph, constants)
+```
+
+_Arguments:_
+- **graph** [Graph](../../graph.py) object created from graphml specification.
+- **constants** dictionary as defined in `constants` section in **app.json**.
+
+_Returns:_ Property value or anempty string. Empty string does not create an entry for the property.
+
+The template also provides built-in graph property generators:
+- `nodeCount` gives the number of nodes in one tile of the graph.
+- `tileCount` gives the number of graph tiles in the generated XML.
+- `totalNodeCount` gives the total number of nodes across all tiles.
+
+### Device instance properties
+
+Callback function definition:
+```py
+def function_name(tile, node_id, node, graph, constants)
+```
+
+_Arguments:_
+- **tile** graph tile index for this device.
+- **node_id** integer index for the node in a graph tile.
+- **node** node name as it appears in the Graph object.
+- **graph** [Graph](../../graph.py) object created from graphml specification.
+- **constants** dictionary as defined in `constants` section in **app.json**.
+
+_Returns:_ Property value or an empty string. Empty string does not create an entry for the property.
+
+The template also provides built-in graph property generators:
+- `id` gives the integer node index (`node_id` argument).
+- `tile` gives the current tile index (`tile` argument).
+- `outDegree` gives the number of outgoing edges for this node.
+
+### Property generation example
+
+**app.json**
+```json
+{
+	"type": "example",
+	"template": "tiles",
+	"properties": {
+		"nodes": {"type": "uint32_t", "generator": "nodeCount"},
+		"leafNodes": {"type": "uint32_t", "generator": "get_leaf_nodes"}
+	},
+	"devices": {
+		"dev": {
+			"instance": "node",
+			"properties": {
+				"id": {"type": "uint32_t", "generator": "id"},
+				"isLeaf": {"type": "uint8_t", "default": 0, "generator": "get_is_leaf"}
+			}
+		}
+	}
+}
+```
+
+**extensions.py**
+```py
+def get_leaf_nodes(graph, constants):
+	return sum(graph.get_outdegree(node)<2 for node in graph.nodes)
+
+def function_name(tile, node_id, node, graph, constants):
+	if graph.get_outdegree(node)<2:
+		return 1
+	else
+		return '' # do not generate property entry, use default
+
+```
+
+Generated graph instance:
+```xml
+<GraphInstance id="example" graphTypeId="example">
+	<Properties>
+		"nodes": 4,
+		"leafNodes": 1
+	</Properties>
+	<DeviceInstances>
+		<DevI id="dev_0_n0" type="dev"><P>"id":0</P></DevI>
+		<DevI id="dev_0_n1" type="dev"><P>"id":1</P></DevI>
+		<DevI id="dev_0_n2" type="dev"><P>"id":2</P></DevI>
+		<DevI id="dev_0_n3" type="dev"><P>"id":3,"isLeaf":1</P></DevI>
+	</DeviceInstances>
+	<!-- skipping edge instances here -->
+</GraphInstance>
+```
