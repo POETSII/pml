@@ -1,4 +1,7 @@
 @ set num_tiles = params.get('tiles', 1) | int
+@ do constants.update({'nodeCount': graph.nodes|length })
+@ do constants.update({'tileCount': num_tiles})
+@ do constants.update({'totalNodeCount': num_tiles * graph.nodes|length})
 
 @ macro make_field(fd_id, fd_content)
 	@ set fd_type = fd_content.get('type', 'uint32_t')
@@ -17,12 +20,8 @@
 	@ for p_id, p_content in properties.items()
 		@ set p_gen = p_content.get('generator', '')
 		@ set p_val = ''
-		@ if p_gen=='nodeCount'
-			@ set p_val = graph.nodes|length
-		@ elif p_gen=='tileCount'
-			@ set p_val = num_tiles
-		@ elif p_gen=='totalNodeCount'
-			@ set p_val = graph.nodes|length
+		@ if constants[p_gen] is defined
+			@ set p_val = constants[p_gen]
 		@ elif p_gen!=''
 			@ set p_val = call_extension(p_gen, {"graph":graph, "constants":constants})
 		@ endif
@@ -49,6 +48,8 @@
 			@ set p_val = tile
 		@ elif p_gen=='outDegree'
 			@ set p_val = graph.get_outdegree(node)
+		@ elif constants[p_gen] is defined
+			@ set p_val = constants[p_gen]
 		@ elif p_gen!=''
 			@ set p_val = call_extension(p_gen, {"tile":tile, "id":node_id, "node":node, "graph":graph, "constants":constants})
 		@ endif
@@ -179,7 +180,7 @@
 		@ for tile in range(num_tiles)
 		<DevI id="{{ device_name }}_{{ tile }}" type="{{ device_name }}">{{ list_device_props(tile, 0, None, device) }}</DevI>
 		@ endfor
-		@ else
+		@ elif device_inst=='unique'
 		<DevI id="{{ device_name }}" type="{{ device_name }}">{{ list_device_props(0, 0, None, device) }}</DevI>
 		@ endif
 		@ endfor
@@ -209,7 +210,13 @@
 		
 		@ else
 		@ set src_inst = devices[src_dev].get('instance', 'node')
+		@ if src_inst=='supervisor'
+			@ set src_dev = ''
+		@ endif
 		@ set dst_inst = devices[dst_dev].get('instance', 'node')
+		@ if dst_inst=='supervisor'
+			@ set dst_dev = ''
+		@ endif
 		
 		@ if (src_inst=='node') and (dst_inst=='node')
 		@ for tile in range(num_tiles)
