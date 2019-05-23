@@ -2,12 +2,12 @@
 	"type": "asp",
 	"model": "tiles",
 	"constants": {
-		"ROOT_COUNT": 10
+		"rootCount": 10
 	},
 	"properties": {
-		"tileCount": { "type": "uint32_t", "generator": "tileCount" },
-		"nodeCount": { "type": "uint32_t", "generator": "nodeCount" },
-		"rootCount": { "type": "uint32_t", "default": "ROOT_COUNT" }
+		"tileCount": { "type": "uint32_t", "default": "tileCount" },
+		"nodeCount": { "type": "uint32_t", "default": "nodeCount" },
+		"rootCount": { "type": "uint32_t", "default": "rootCount" }
 	},
 	"messages": {
 		"heartbeat": {
@@ -46,8 +46,8 @@
 				"fin": { "type": "uint8_t", "default": 0 },
 				"finSent": { "type": "uint8_t", "default": 0 },
 				"finIdx": { "type": "uint16_t", "default": 0 },
-				"buff": { "type": "uint32_t", "length": "ROOT_COUNT" },
-				"updated": { "type": "uint8_t", "length": "ROOT_COUNT" },
+				"buff": { "type": "uint32_t", "length": "rootCount" },
+				"updated": { "type": "uint8_t", "length": "rootCount" },
 				"updatePending": { "type": "uint32_t" }
 			}
 		},
@@ -55,8 +55,14 @@
 			"instance": "supervisor",
 			"doc": "TODO: supervisor is not implemented yet",
 			"properties": {
+				"nodeCount": { "type": "uint32_t", "default": "totalNodeCount" },
+				"loopMax": { "type": "uint32_t", "default": 1000 }
 			},
 			"state": {
+				"fin": { "type": "uint8_t", "length":  "totalNodeCount" },
+				"finIdx": { "type": "uint16_t", "length":  "totalNodeCount" },
+				"avgHops": { "type": "float", "length":  "totalNodeCount" },
+				"loopCount": { "type": "uint32_t", "default": 0 }
 			}
 		}
 	}
