@@ -46,6 +46,9 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
     """
 
     content = read_json(app_file)
+    if not 'constants' in content:
+        content['constants'] = {}
+    content['constants'].update(params)
 
     ext_file = get_path('extensions.py', app_file)
     ext_exists = os.path.isfile(ext_file)
@@ -76,17 +79,15 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
         else: raise Exception('Required file %s not found' % file)
 
     def get_field_default(field):
-        if "default" not in field:
+        if 'default' not in field:
             return ''
         
-        fdef = field["default"]
+        fdef = field['default']
         
         if (type(fdef) is int) or (type(fdef) is float):
             return fdef
-        if (is_str(fdef)) and (fdef in params):
-            return params[fdef]
-        if (is_str(fdef)) and (fdef in content["constants"]):
-            return content["constants"][fdef]
+        if (is_str(fdef)) and (fdef in content['constants']):
+            return content['constants'][fdef]
         
         return fdef
     
@@ -94,16 +95,14 @@ def pml(app_file, graphml, props=dict(), params=dict(), prettify=False):
         if "length" not in field:
             return 1  # scalar
 
-        flen = field["length"]
+        flen = field['length']
 
         if type(flen) is int:
             return flen
-        if (is_str(flen)) and (flen in params):
-            return params[flen]
-        if (is_str(flen)) and (flen in content["constants"]):
-            return content["constants"][flen]
+        if (is_str(flen)) and (flen in content['constants']):
+            return content['constants'][flen]
 
-        raise Exception("Could not determine length of field %s" % field)
+        raise Exception('Could not determine length of field %s' % field)
 
     def get_props_string(json):
         """Return a bracketless string representation of a JSON object."""
@@ -148,13 +147,13 @@ def parse_params(param_str):
 
 
 def main():
-    args = docopt(usage, version="pml v0.1")
+    args = docopt(usage, version='pml v0.1')
     xml = pml(
-        app_file=args["<app.json>"],
-        graphml=read_file(args["<file.graphml>"]),
-        props=read_json(args["--props"]) if args["--props"] else {},
-        params=parse_params(args["--param"] or ""),
-        prettify=args["--pretty"]
+        app_file=args['<app.json>'],
+        graphml=read_file(args['<file.graphml>']),
+        props=read_json(args['--props']) if args['--props'] else {},
+        params=parse_params(args['--param'] or ''),
+        prettify=args['--pretty']
     )
     print(xml)
 
