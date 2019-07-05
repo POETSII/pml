@@ -22,7 +22,7 @@ else { //Sent but finished cancelled
 message->finIdx = deviceState->finIdx;
 
 uint32_t total = 0;
-for(int i = 0; i < graphProperties->rootCount; i++) {
+for(uint32_t i = 0; i < graphProperties->rootCount; i++) {
 	total += deviceState->buff[i];
 }
 message->avgHops = total / (float)graphProperties->rootCount;

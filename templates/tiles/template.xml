@@ -105,18 +105,21 @@
 				@ if device['doc'] is defined
 				<Documentation>{{ device['doc'] }}</Documentation>
 				@ endif
+				@ if device['properties'] is defined
 				<Properties>
 					@ set property_items = device.get('properties', {}).items()
 					@ for p_id, p_content in property_items
 					{{ make_field(p_id, p_content) }}
 					@ endfor
 				</Properties>
-
+				@ endif
+				@ if device['state'] is defined
 				<State>
 					@ for s_id, s_content in device['state'].items()
 					{{ make_field(s_id, s_content) }}
 					@ endfor
 				</State>
+				@ endif
 
 				@ if is_supervisor
 				<Code><![CDATA[

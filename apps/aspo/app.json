@@ -24,7 +24,7 @@
 		},
 		"finished": {
 			"src": ["node"],
-			"dst": ["supervisor"],
+			"dst": ["supervisorNode"],
 			"fields": {
 				"graphInst": { "type": "uint32_t" },
 				"id": { "type": "uint32_t" },
@@ -38,11 +38,14 @@
 		"node" : {
 			"instance": "node",
 			"properties": {
+				"hcMax": { "type": "uint16_t", "default": 10 },
 				"graphInst": { "type": "uint32_t", "generator": "tile" },
 				"id": { "type": "uint32_t", "generator": "id" },
 				"rootIdx": { "type": "int32_t", "default": -1, "generator": "get_root_index" }
 			},
 			"state": {
+				"hc": { "type": "uint16_t", "default": 0 },
+				"active": { "type": "uint8_t", "default": 0 },
 				"fin": { "type": "uint8_t", "default": 0 },
 				"finSent": { "type": "uint8_t", "default": 0 },
 				"finIdx": { "type": "uint16_t", "default": 0 },
@@ -51,19 +54,8 @@
 				"updatePending": { "type": "uint32_t" }
 			}
 		},
-		"supervisor" : {
-			"instance": "supervisor",
-			"doc": "TODO: supervisor is not implemented yet",
-			"properties": {
-				"nodeCount": { "type": "uint32_t", "default": "totalNodeCount" },
-				"loopMax": { "type": "uint32_t", "default": 1000 }
-			},
-			"state": {
-				"fin": { "type": "uint8_t", "length":  "totalNodeCount" },
-				"finIdx": { "type": "uint16_t", "length":  "totalNodeCount" },
-				"avgHops": { "type": "float", "length":  "totalNodeCount" },
-				"loopCount": { "type": "uint32_t", "default": 0 }
-			}
+		"supervisorNode" : {
+			"instance": "supervisor"
 		}
 	}
 }

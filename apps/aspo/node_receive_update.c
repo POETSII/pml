@@ -6,7 +6,7 @@ handler_log(2,"UPD_IN");
 // except for deviceState->buff[self] = 0
 
 if(message->rootIdx < graphProperties->rootCount) {
-	if(message->hops < deviceState->Buff[message->rootIdx]) {
+	if(message->hops < deviceState->buff[message->rootIdx]) {
 		deviceState->buff[message->rootIdx] = message->hops;
 		if(deviceState->updated[message->rootIdx] == 0) {
 			deviceState->updatePending++;

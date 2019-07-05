@@ -24,3 +24,11 @@
 uint32_t finCount = 0;
 uint8_t sentDone = 0;
 uint8_t nodesDone = 0;
+
+const uint32_t nodeCount = {{ constants['totalNodeCount'] }};
+uint32_t loopMax = 1000;
+
+uint8_t fin[nodeCount];
+uint16_t finIdx[nodeCount];
+float avgHops[nodeCount];
+uint32_t loopCount = 0;

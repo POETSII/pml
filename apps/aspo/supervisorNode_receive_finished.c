@@ -7,39 +7,39 @@ if((message->id >= graphProperties->nodeCount) || (message->graphInst >= graphPr
 else {
 	uint64_t loc = (message->graphInst * graphProperties->nodeCount) + message->id;
 
-	if(message->fin && (message->finIdx > deviceState->finIdx[loc])) {
+	if(message->fin && (message->finIdx > finIdx[loc])) {
 		//It's a finished message that is newer than what we have.
 		VERBOSE_PRINT("\tFIN:" << message->id << "@" << message->graphInst << " IDX:" << message->finIdx << " VAL:"  << message->avgHops);
-		if(!deviceState->fin[loc]) { //Node is not already finished.
+		if(!fin[loc]) { //Node is not already finished.
 			finCount++;
 		}
-		deviceState->fin[loc].fin = 1;
-		deviceState->finIdx[loc] = message->finIdx;
-		deviceState->avgHops[loc] = message->avgHops;
+		fin[loc].fin = 1;
+		finIdx[loc] = message->finIdx;
+		avgHops[loc] = message->avgHops;
 	}
-	else if(!(message->fin) && message->finIdx >= deviceState->finIdx[loc]) {
+	else if(!(message->fin) && message->finIdx >= finIdx[loc]) {
 		//It's a not finished message cancelling the current or future finished message
 		VERBOSE_PRINT("\tNFIN:" << message->id << "@" << message->graphInst << " IDX:" << message->finIdx);
-		if(deviceState->fin[loc]) { //Node is already finished.
+		if(fin[loc]) { //Node is already finished.
 			finCount--;
 		}
-		deviceState->fin[loc] = 0;
-		deviceState->finIdx[loc] = message->finIdx;
-		deviceState->avgHops[loc] = message->avgHops;
+		fin[loc] = 0;
+		finIdx[loc] = message->finIdx;
+		avgHops[loc] = message->avgHops;
 	}
 	else {//Otherwise do nothing with the finish message as it is a duplicate.
 		VERBOSE_PRINT("\tIGNORED:" << message->id << "@" << message->graphInst << " IDX:" << message->finIdx);
 	}
 
-	VERBOSE_PRINT("\tFINCOUNT:" << finCount << "/" << deviceProperties->nodeCount);
+	VERBOSE_PRINT("\tFINCOUNT:" << finCount << "/" << sEdgeProperties->nodeCount);
 
 	//Periodic node count updates
-	if(deviceState->loopCount == 0) {
-		DEBUG_PRINT("\tNODES_DONE: " << finCount << "/" << deviceProperties->nodeCount);
-		deviceState->loopCount = deviceProperties->loopMax;
+	if(loopCount == 0) {
+		DEBUG_PRINT("\tNODES_DONE: " << finCount << "/" << sEdgeProperties->nodeCount);
+		loopCount = sEdgeProperties->loopMax;
 	}
-	deviceState->loopCount--;
-	if(finCount >= deviceProperties->nodeCount) {
+	loopCount--;
+	if(finCount >= sEdgeProperties->nodeCount) {
 		//All of the nodes have finished, do something.
 		DEBUG_PRINT("\tNODES_DONE: " << finCount);
 		//handler_log(2, "ALL NODES_DONE");
@@ -65,7 +65,7 @@ else {
 		for(unsigned int ix = 0; ix < sEdgeProperties->xSize; ix++) {
 			loc = ix*sEdgeProperties->xSize;
 			for(unsigned int iy = 0; iy < sEdgeProperties->ySize; iy++) {
-				oFile << ix << ", " << iy << ", " << sEdgeState->data_t[loc].t << std::endl;
+				oFile << ix << ", " << iy << ", " << data_t[loc].t << std::endl;
 				loc++;
 			}
 		}
