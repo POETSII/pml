@@ -26,6 +26,7 @@ uint8_t sentDone = 0;
 uint8_t nodesDone = 0;
 
 const uint32_t nodeCount = {{ constants['totalNodeCount'] }};
+const uint32_t tileCount = {{ constants['tileCount'] }};
 uint32_t loopMax = 1000;
 
 uint8_t fin[nodeCount];

@@ -7,10 +7,10 @@
 	@ set fd_type = fd_content.get('type', 'uint32_t')
 	@ set fd_length = get_field_length(fd_content)
 	@ set is_array = fd_length > 1
-	{%- if is_array -%}
-<Array name="{{ fd_id }}" type="{{ fd_type }}" length="{{ fd_length }}" />
-	{%- else -%}
 	{%- set fd_def = get_field_default(fd_content) -%}
+	{%- if is_array -%}
+<Array name="{{ fd_id }}" type="{{ fd_type }}" length="{{ fd_length }}"{% if fd_def!='' %} default="{{ fd_def }}"{% endif %} />
+	{%- else -%}
 <Scalar name="{{ fd_id }}" type="{{ fd_type }}"{% if fd_def!='' %} default="{{ fd_def }}"{% endif %} />
 	{%- endif -%}
 @ endmacro

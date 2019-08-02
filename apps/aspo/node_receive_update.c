@@ -2,12 +2,13 @@
 handler_log(2,"UPD_IN");
 #endif
 
-// TODO: deviceState->buff needs to be initialised to MAX_INT
-// except for deviceState->buff[self] = 0
+// FIXME
+//deviceState->hc = 0;
+//deviceState->active = 1;
 
 if(message->rootIdx < graphProperties->rootCount) {
-	if(message->hops < deviceState->buff[message->rootIdx]) {
-		deviceState->buff[message->rootIdx] = message->hops;
+	if(message->hops+1 < deviceState->buff[message->rootIdx]) {
+		deviceState->buff[message->rootIdx] = message->hops+1;
 		if(deviceState->updated[message->rootIdx] == 0) {
 			deviceState->updatePending++;
 		}

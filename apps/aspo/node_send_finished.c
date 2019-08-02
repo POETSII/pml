@@ -25,7 +25,7 @@ uint32_t total = 0;
 for(uint32_t i = 0; i < graphProperties->rootCount; i++) {
 	total += deviceState->buff[i];
 }
-message->avgHops = total / (float)graphProperties->rootCount;
+message->avgHops = (float)total / (float)graphProperties->rootCount;
 
 message->id = deviceProperties->id;
 message->graphInst = deviceProperties->graphInst;

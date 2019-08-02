@@ -1,11 +1,11 @@
 
 VERBOSE_PRINT("MSG:");
-if((message->id >= graphProperties->nodeCount) || (message->graphInst >= graphProperties->tileCount)) {
+if((message->id >= nodeCount) || (message->graphInst >= tileCount)) {
 	//Something has gone horribly wrong and we have received a message for a node that can't exist.
 	DEBUG_PRINT("ERR_MSG_CELL_NE");
 }
 else {
-	uint64_t loc = (message->graphInst * graphProperties->nodeCount) + message->id;
+	uint64_t loc = (message->graphInst * nodeCount) + message->id;
 
 	if(message->fin && (message->finIdx > finIdx[loc])) {
 		//It's a finished message that is newer than what we have.
@@ -13,7 +13,7 @@ else {
 		if(!fin[loc]) { //Node is not already finished.
 			finCount++;
 		}
-		fin[loc].fin = 1;
+		fin[loc] = 1;
 		finIdx[loc] = message->finIdx;
 		avgHops[loc] = message->avgHops;
 	}
@@ -31,15 +31,15 @@ else {
 		VERBOSE_PRINT("\tIGNORED:" << message->id << "@" << message->graphInst << " IDX:" << message->finIdx);
 	}
 
-	VERBOSE_PRINT("\tFINCOUNT:" << finCount << "/" << sEdgeProperties->nodeCount);
+	VERBOSE_PRINT("\tFINCOUNT:" << finCount << "/" << nodeCount);
 
 	//Periodic node count updates
 	if(loopCount == 0) {
-		DEBUG_PRINT("\tNODES_DONE: " << finCount << "/" << sEdgeProperties->nodeCount);
-		loopCount = sEdgeProperties->loopMax;
+		DEBUG_PRINT("\tNODES_DONE: " << finCount << "/" << nodeCount);
+		loopCount = loopMax;
 	}
 	loopCount--;
-	if(finCount >= sEdgeProperties->nodeCount) {
+	if(finCount >= nodeCount) {
 		//All of the nodes have finished, do something.
 		DEBUG_PRINT("\tNODES_DONE: " << finCount);
 		//handler_log(2, "ALL NODES_DONE");
@@ -49,6 +49,9 @@ else {
 			DEBUG_PRINT("\tSEND_DONE");
 			//Supervisor::outputs[0]->OnSend(outMsg, msgBuf, 1);
 		}
+
+		printf("Done... ?");
+
 		//TODO: Send Data to MPI Land. Or write to file.
 		/*
 		//Wite data to CSV

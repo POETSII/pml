@@ -2,7 +2,7 @@
 #include <cmath>
 
 //#define LESSDEBUG
-#define USEDEBUG
+//#define USEDEBUG
 //#define VERBOSEDEBUG
 
 int heartbeatIndex = 0;

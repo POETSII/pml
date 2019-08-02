@@ -10,10 +10,6 @@
 		"rootCount": { "type": "uint32_t", "default": "rootCount" }
 	},
 	"messages": {
-		"heartbeat": {
-			"src": [],
-			"dst": ["node"]
-		},
 		"update": {
 			"src": ["node"],
 			"dst": ["node"],
@@ -32,6 +28,10 @@
 				"finIdx": { "type": "uint16_t" },
 				"avgHops": { "type": "float" }
 			}
+		},
+		"heartbeat": {
+			"src": [],
+			"dst": ["node"]
 		}
 	},
 	"devices": {
@@ -49,7 +49,7 @@
 				"fin": { "type": "uint8_t", "default": 0 },
 				"finSent": { "type": "uint8_t", "default": 0 },
 				"finIdx": { "type": "uint16_t", "default": 0 },
-				"buff": { "type": "uint32_t", "length": "rootCount" },
+				"buff": { "type": "uint16_t", "length": "rootCount", "default": 65535 },
 				"updated": { "type": "uint8_t", "length": "rootCount" },
 				"updatePending": { "type": "uint32_t" }
 			}
